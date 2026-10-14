@@ -5,11 +5,11 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Controle de Abastecimentos</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#EEF2F4;--card:#fff;--ink:#10222B;--mute:#5B6B73;--brand:#0B4F6C;--line:#D5DEE3;--ok:#17794A;--okb:#E3F4EA;--wa:#9A5B00;--wab:#FFF0D6;--pa:#1E5FA8;--pab:#E2EEFB;--er:#B3261E}
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--ink);font:18px/1.45 'Atkinson Hyperlegible',system-ui,sans-serif}
+body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.5 'Lexend',system-ui,sans-serif}
 h1{font-size:24px;margin:0}h2{font-size:21px;margin:18px 0 10px}
 .wrap{max-width:980px;margin:auto;padding:16px 16px 110px}
 header{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:4px 0 12px}
@@ -52,11 +52,18 @@ ul{padding-left:20px;margin:8px 0}#prev ul{max-height:28vh;overflow:auto}
 details.card{margin-bottom:10px}summary{cursor:pointer;min-height:44px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .toast{position:fixed;left:12px;right:12px;top:12px;max-width:560px;margin:auto;background:var(--ink);color:#fff;padding:14px 16px;border-radius:12px;z-index:50}.toast.er{background:var(--er)}
 .riscado{text-decoration:line-through;color:var(--mute)}
+html{scroll-behavior:smooth}
+.btns{flex-wrap:wrap}.btns .btn{min-width:130px}
+.card.ok{border-top:4px solid var(--ok)}.card.wa{border-top:4px solid #E0A030}.card.pa{border-top:4px solid var(--pa)}
+@media(min-width:701px){tr[data-s=pago] td:first-child{box-shadow:inset 5px 0 var(--ok)}tr[data-s=parcial] td:first-child{box-shadow:inset 5px 0 var(--pa)}tr[data-s=pendente] td:first-child{box-shadow:inset 5px 0 #E0A030}}
+@media(max-width:700px){tr[data-s=pago]{border-left:5px solid var(--ok)}tr[data-s=parcial]{border-left:5px solid var(--pa)}tr[data-s=pendente]{border-left:5px solid #E0A030}}
+.atalhos{display:flex;gap:10px;flex-wrap:wrap;margin:6px 0 4px}.atalhos .btn{min-height:48px;font-size:15px;flex:1;padding:0 12px}
+@media(min-width:900px){nav{top:0;bottom:auto;border-top:0;border-bottom:1px solid var(--line);justify-content:center}nav button{flex:0 0 200px;min-height:60px;font-size:16px;box-shadow:none}nav button.on{box-shadow:inset 0 -3px var(--brand)}.wrap{padding:84px 16px 40px}}
 @media print{nav,.noprint,.btn{display:none!important}body{background:#fff}.wrap{padding:0}}
 </style>
 </head>
 <body>
-<div id="app"></div>
+<div id="app"><p class="vazio">Carregando...</p></div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
 <script>
 /* ============ CONFIGURAÇÃO (preencha com os dados do seu projeto Supabase) ============
@@ -79,7 +86,7 @@ function num(s) { // aceita 1.500,00 / 1500,50 / 1500.5 / 1500
   else if (!/^\d+\.\d{1,2}$/.test(s)) s = s.replace(/\./g, '');
   return Number(s);
 }
-const CHIP = {pago:['ok','Pago'], parcial:['pa','Parcialmente pago'], pendente:['wa','Pendente'], cancelado:['cx','Cancelado']};
+const CHIP = {pago:['ok','Pago'], parcial:['pa','Parcialmente pago'], pendente:['wa','Pendente'], cancelado:['cx','Removido']};
 const chip = s => `<span class="chip ${CHIP[s][0]}">${CHIP[s][1]}</span>`;
 
 /* ============ estado ============ */
@@ -89,11 +96,16 @@ const adm = () => S.papel === 'admin';
 const ativos = () => S.abs.filter(x => !x.cancelado);
 const fifo = () => ativos().filter(x => cents(x.pendente) > 0).sort((a,b) => a.data<b.data?-1 : a.data>b.data?1 : a.criado_em<b.criado_em?-1 : a.criado_em>b.criado_em?1 : a.id<b.id?-1:1);
 
+const msg = e => { const s = String(e?.message || e || '').replace(/^Aviso:\s*/, ''); return s.charAt(0).toUpperCase() + s.slice(1); };
+// dinheiro de pagamentos válidos que ainda não está em nenhum abastecimento ativo
+const credito = () => { const ok = S.pgs.filter(p => !p.estornado), ids = new Set(ok.map(p => p.id)), canc = new Set(S.abs.filter(a => a.cancelado).map(a => a.id));
+  return (cents(sum(ok,'valor')) - S.als.filter(a => ids.has(a.pagamento_id) && !canc.has(a.abastecimento_id)).reduce((s,a) => s + cents(a.valor), 0)) / 100; };
+
 /* ============ avisos e janelas ============ */
 function toast(m, er) { const t = document.createElement('div'); t.className = 'toast' + (er ? ' er' : ''); t.setAttribute('role','status'); t.textContent = m; document.body.appendChild(t); setTimeout(() => t.remove(), er ? 7000 : 3500); }
 function modal(html) { const o = document.createElement('div'); o.className = 'ov'; o.innerHTML = `<div class="box" role="dialog">${html}</div>`; document.body.appendChild(o); o.close = () => o.remove(); o.addEventListener('click', e => { if (e.target === o) o.remove(); }); return o; }
 function ask(t, msg, ok = 'Confirmar') { return new Promise(r => { const o = modal(`<h2>${t}</h2><p>${msg}</p><div class="btns"><button class="btn sec" data-r="0">Voltar</button><button class="btn" data-r="1">${ok}</button></div>`); o.addEventListener('click', e => { const b = e.target.closest('[data-r]'); if (b || e.target === o) { o.remove(); r(!!b && b.dataset.r == 1); } }); }); }
-async function run(b, fn) { const t = b.textContent; b.disabled = true; b.textContent = 'Aguarde...'; try { await fn(); } catch (e) { toast(e.message || 'Algo deu errado. Tente de novo.', 1); } finally { if (b.isConnected) { b.disabled = false; b.textContent = t; } } }
+async function run(b, fn) { const t = b.textContent; b.disabled = true; b.textContent = 'Aguarde...'; try { await fn(); } catch (e) { toast(msg(e) || 'Algo deu errado. Tente de novo.', 1); } finally { if (b.isConnected) { b.disabled = false; b.textContent = t; } } }
 
 /* ============ dados ============ */
 async function all(q) { let o = [], f = 0; for (;;) { const {data, error} = await q().range(f, f + 999); if (error) throw error; o = o.concat(data); if (data.length < 1000) break; f += 1000; } return o; }
@@ -141,18 +153,19 @@ function render() {
 function inicio() {
   const a = ativos(), tot = sum(a,'valor'), pago = sum(a,'pago'), pend = sum(a,'pendente');
   const parc = a.filter(x => x.situacao == 'parcial').length, ult = S.pgs.find(p => !p.estornado);
-  const ant = fifo().slice(0, 5);
+  const ant = fifo().slice(0, 5), cred = credito(), nS = k => a.filter(x => x.situacao == k).length;
   return `<div class="hero"><div>Falta pagar</div><div class="n">${R(pend)}</div><div class="bar"><i style="width:${tot ? Math.min(100, pago/tot*100) : 0}%"></i></div><div style="margin-top:8px">${R(pago)} pagos de ${R(tot)}</div></div>
   ${adm() ? `<div class="acoes"><button class="btn" data-act="novoab">Novo abastecimento</button><button class="btn sec" data-act="pagar">Registrar pagamento</button></div>` : ''}
-  <div class="grid"><div class="card"><span>Total abastecido</span><b>${R(tot)}</b></div><div class="card"><span>Total pago</span><b>${R(pago)}</b></div><div class="card"><span>Saldo pendente</span><b>${R(pend)}</b></div>
-  <div class="card"><span>Abastecimentos</span><b>${a.length}</b></div><div class="card"><span>Parcialmente pagos</span><b>${parc}</b></div>
-  <div class="card"><span>Último pagamento</span><b>${ult ? R(ult.valor) : '-'}</b>${ult ? `<small>em ${D(ult.data)}</small>` : ''}</div></div>
+  <div class="grid"><div class="card"><span>Total abastecido</span><b>${R(tot)}</b></div><div class="card ok"><span>Total pago</span><b>${R(pago)}</b></div><div class="card wa"><span>Saldo pendente</span><b>${R(pend)}</b></div>
+  <div class="card"><span>Abastecimentos</span><b>${a.length}</b></div><div class="card pa"><span>Parcialmente pagos</span><b>${parc}</b></div>
+  <div class="card"><span>Último pagamento</span><b>${ult ? R(ult.valor) : '-'}</b>${ult ? `<small>em ${D(ult.data)}</small>` : ''}</div>${cred > 0 ? `<div class="card ok"><span>Crédito guardado</span><b>${R(cred)}</b><small>abate as próximas dívidas</small></div>` : ''}</div>
+  <div class="atalhos noprint"><button class="btn sec" data-act="filtro" data-s="pendente">Pendentes (${nS('pendente')})</button><button class="btn sec" data-act="filtro" data-s="parcial">Parciais (${nS('parcial')})</button><button class="btn sec" data-act="filtro" data-s="pago">Pagos (${nS('pago')})</button></div>
   <h2>Dívidas mais antigas</h2>${ant.length ? tabela(ant) : '<p class="vazio">Nada pendente. Tudo pago.</p>'}
   ${adm() ? '<p class="noprint"><button class="btn lnk" data-act="testar">Testar aviso do Telegram</button></p>' : ''}`;
 }
 
 function tabela(l) {
-  return `<table><thead><tr><th>Data<th>Pessoa<th>Veículo<th class="r">Valor original<th class="r">Valor pago<th class="r">Falta pagar<th>Situação</thead><tbody>${l.map(x => `<tr data-act="ab" data-id="${x.id}"><td data-label="Data">${D(x.data)}<td data-label="Pessoa">${esc(x.pessoa)}<td data-label="Veículo">${esc(x.veiculo)}${x.placa ? ' <small>' + esc(x.placa) + '</small>' : ''}<td data-label="Valor original" class="r">${R(x.valor)}<td data-label="Valor pago" class="r">${R(x.pago)}<td data-label="Falta pagar" class="r"><b>${R(x.pendente)}</b><td data-label="Situação">${chip(x.situacao)}`).join('')}</tbody></table>`;
+  return `<table><thead><tr><th>Data<th>Pessoa<th>Veículo<th class="r">Valor original<th class="r">Valor pago<th class="r">Falta pagar<th>Situação</thead><tbody>${l.map(x => `<tr data-act="ab" data-id="${x.id}" data-s="${x.situacao}"><td data-label="Data">${D(x.data)}<td data-label="Pessoa">${esc(x.pessoa)}<td data-label="Veículo">${esc(x.veiculo)}${x.placa ? ' <small>' + esc(x.placa) + '</small>' : ''}<td data-label="Valor original" class="r">${R(x.valor)}<td data-label="Valor pago" class="r">${R(x.pago)}<td data-label="Falta pagar" class="r"><b>${R(x.pendente)}</b><td data-label="Situação">${chip(x.situacao)}`).join('')}</tbody></table>`;
 }
 
 const uniq = k => [...new Set(S.abs.map(x => x[k]).filter(Boolean))].sort((a,b) => a.localeCompare(b,'pt-BR'));
@@ -177,7 +190,7 @@ function pgsTab() {
   return `<h2>Pagamentos</h2>${adm() ? '<div class="acoes"><button class="btn sec" data-act="pagar">Registrar pagamento</button></div>' : ''}` + (S.pgs.length ? S.pgs.map(p => {
     const als = S.als.filter(a => a.pagamento_id == p.id);
     return `<details class="card"><summary><b class="${p.estornado ? 'riscado' : ''}">${R(p.valor)}</b> em ${D(p.data)}, ${esc(p.forma)} ${p.estornado ? '<span class="chip wa">Estornado</span>' : ''}</summary>
-    ${p.observacao ? `<p>${esc(p.observacao)}</p>` : ''}<p class="mute">Como o dinheiro foi distribuído:</p><ul>${als.map(a => { const x = S.abs.find(y => y.id == a.abastecimento_id) || {}; return `<li>${R(a.valor)} para o abastecimento nº ${x.numero} de ${D(x.data)} (${esc(x.pessoa)})</li>`; }).join('')}</ul>
+    ${p.observacao ? `<p>${esc(p.observacao)}</p>` : ''}<p class="mute">Como o dinheiro foi distribuído:</p><ul>${als.map(a => { const x = S.abs.find(y => y.id == a.abastecimento_id) || {}; return `<li>${R(a.valor)} para o abastecimento nº ${x.numero} de ${D(x.data)} (${esc(x.pessoa)})${x.cancelado ? ' - removido' : ''}</li>`; }).join('')}</ul>
     <p>Total distribuído: <b>${R(sum(als,'valor'))}</b></p>${adm() && !p.estornado ? `<button class="btn sec peq" data-act="estornar" data-id="${p.id}">Estornar pagamento</button>` : ''}</details>`;
   }).join('') : '<p class="vazio">Nenhum pagamento registrado ainda.</p>');
 }
@@ -267,13 +280,13 @@ async function detAb(id) {
   <p>Valor original: <b>${R(a.valor)}</b><br>Valor pago: <b>${R(a.pago)}</b><br>Falta pagar: <b>${R(a.pendente)}</b></p>${a.observacoes ? `<p>${esc(a.observacoes)}</p>` : ''}
   <p class="mute">Pagamentos recebidos:</p>${als.length ? `<ul>${als.map(x => `<li>${R(x.valor)} do pagamento de ${D(x.p.data)}</li>`).join('')}</ul>` : '<p>Nenhum ainda.</p>'}
   <p class="mute">Alterações:</p><div id="hist">Carregando...</div>
-  <div class="btns">${adm() && !a.cancelado ? '<button class="btn sec" id="ed">Corrigir</button><button class="btn sec" id="cn">Cancelar abastecimento</button>' : ''}<button class="btn" id="fc">Fechar</button></div>`);
+  <div class="btns">${adm() && !a.cancelado ? '<button class="btn sec" id="ed">Corrigir</button><button class="btn sec" id="cn">Remover abastecimento</button>' : ''}<button class="btn" id="fc">Fechar</button></div>`);
   $('#fc').onclick = () => o.close();
   if ($('#ed')) { $('#ed').onclick = () => { o.close(); formAb(a); };
-    $('#cn').onclick = async () => { if (!await ask('Cancelar abastecimento?', `O abastecimento nº ${a.numero} (${R(a.valor)}) deixará de contar nos totais, mas continua no histórico.`, 'Sim, cancelar')) return;
-      try { const {error} = await sb.rpc('cancelar_abastecimento', {p_id:a.id}); if (error) throw error; o.close(); toast('Abastecimento cancelado.'); await carregar(); } catch (e) { toast(String(e.message).replace(/^Aviso:\s*/, ''), 1); } }; }
+    $('#cn').onclick = async () => { if (!await ask('Remover abastecimento?', `O abastecimento nº ${a.numero} (${R(a.valor)}) deixa de contar nos totais e sai da lista, mas fica guardado no histórico.${cents(a.pago) > 0 ? ` Ele já recebeu <b>${R(a.pago)}</b>: esse dinheiro não se perde. Ele passa para as próximas dívidas mais antigas (ou fica guardado como crédito).` : ''}`, 'Sim, remover')) return;
+      try { const {error} = await sb.rpc('cancelar_abastecimento', {p_id:a.id}); if (error) throw error; o.close(); toast('Abastecimento removido.'); await carregar(); } catch (e) { toast(msg(e), 1); } }; }
   const {data} = await sb.from('historico').select('*').eq('registro_id', id).order('id');
-  const L = {data:'Data', pessoa:'Pessoa', veiculo:'Veículo', placa:'Placa', valor:'Valor', observacoes:'Observações', cancelado:'Cancelado'};
+  const L = {data:'Data', pessoa:'Pessoa', veiculo:'Veículo', placa:'Placa', valor:'Valor', observacoes:'Observações', cancelado:'Removido'};
   const fv = (k, v) => k == 'valor' ? R(v) : k == 'data' ? D(v) : k == 'cancelado' ? (v ? 'sim' : 'não') : (v || '-');
   const h = (data || []).map(x => { const dt = new Date(x.criado_em).toLocaleDateString('pt-BR');
     if (x.acao == 'INSERT') return `<li>${dt}: registrado</li>`;
@@ -291,15 +304,16 @@ const dec = n => Number(n).toFixed(2).replace('.', ',');
 
 /* ============ ações (cliques) ============ */
 const ACT = {
+  filtro: d => { S.f = {...S.f, sit:d.s}; S.tab = 'abs'; render(); scrollTo(0, 0); },
   aba: d => { S.tab = d.t; render(); scrollTo(0, 0); },
   sair: async () => { await sb.auth.signOut(); S.user = null; S.papel = ''; render(); },
   atualizar: async () => { await carregar(); toast('Dados atualizados.'); },
   novoab: () => formAb(), pagar: () => formPag(), ab: d => detAb(d.id), imprimir: () => print(),
-  testar: async () => { try { const {error} = await sb.rpc('testar_telegram'); if (error) throw error; toast('Mensagem de teste enviada. Confira no Telegram em alguns segundos.'); } catch (e) { toast(e.message, 1); } },
+  testar: async () => { try { const {error} = await sb.rpc('testar_telegram'); if (error) throw error; toast('Mensagem de teste enviada. Confira no Telegram em alguns segundos.'); } catch (e) { toast(msg(e), 1); } },
   estornar: async d => {
     const p = S.pgs.find(x => x.id == d.id);
     if (!await ask('Estornar pagamento?', `O pagamento de <b>${R(p.valor)}</b> de ${D(p.data)} será desfeito e os valores voltam a ficar pendentes. O registro continua no histórico.`, 'Sim, estornar')) return;
-    try { const {error} = await sb.rpc('estornar_pagamento', {p_id:p.id, p_motivo:null}); if (error) throw error; toast('Pagamento estornado.'); await carregar(); } catch (e) { toast(String(e.message).replace(/^Aviso:\s*/, ''), 1); }
+    try { const {error} = await sb.rpc('estornar_pagamento', {p_id:p.id, p_motivo:null}); if (error) throw error; toast('Pagamento estornado.'); await carregar(); } catch (e) { toast(msg(e), 1); }
   },
   csvab: () => { const {de, ate} = S.r; baixar('abastecimentos', [['Nº','Data','Pessoa','Veículo','Placa','Valor','Pago','Falta pagar','Situação','Observações'], ...S.abs.filter(x => (!de || x.data >= de) && (!ate || x.data <= ate)).map(x => [x.numero, D(x.data), x.pessoa, x.veiculo, x.placa, dec(x.valor), dec(x.pago), dec(x.pendente), CHIP[x.situacao][1], x.observacoes])]); },
   csvpg: () => { const {de, ate} = S.r; baixar('pagamentos', [['Data','Valor','Forma','Observação','Situação','Distribuição'], ...S.pgs.filter(x => (!de || x.data >= de) && (!ate || x.data <= ate)).map(p => [D(p.data), dec(p.valor), p.forma, p.observacao, p.estornado ? 'Estornado' : 'Válido', S.als.filter(a => a.pagamento_id == p.id).map(a => { const x = S.abs.find(y => y.id == a.abastecimento_id) || {}; return `nº ${x.numero} (${D(x.data)}): ${dec(a.valor)}`; }).join(' | ')])]); }
