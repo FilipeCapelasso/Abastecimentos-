@@ -1,414 +1,361 @@
-update public.app_config set valor = '8628884766:AAGJHRoelEX2vM1tACQ2luJkDVOmFQhx1Tg' where chave = 'telegram_token';
-update public.app_config set valor = '7694564020' where chave = 'telegram_chat_ids';
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#0B4F6C"><meta name="color-scheme" content="light dark">
+<title>Controle de Abastecimentos</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#EEF2F4;--card:#fff;--ink:#10222B;--mute:#5B6B73;--brand:#0B4F6C;--line:#D5DEE3;--ok:#17794A;--okb:#E3F4EA;--wa:#9A5B00;--wab:#FFF0D6;--pa:#1E5FA8;--pab:#E2EEFB;--er:#B3261E}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.5 'Lexend',system-ui,sans-serif}
+h1{font-size:24px;margin:0}h2{font-size:21px;margin:18px 0 10px}
+.wrap{max-width:980px;margin:auto;padding:16px 16px 110px}
+header{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:4px 0 12px}
+header small{display:block}
+.mute,small{color:var(--mute)}.erro{color:var(--er);font-weight:700}.vazio{text-align:center;color:var(--mute);padding:24px}
+:focus-visible{outline:3px solid #F2A900;outline-offset:2px}
+.btn{min-height:56px;border:0;border-radius:14px;background:var(--brand);color:#fff;font-family:inherit;font-size:18px;font-weight:700;padding:0 22px;cursor:pointer}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.btn.sec{background:var(--card);color:var(--brand);border:2px solid var(--brand)}
+.btn.peq{min-height:44px;font-size:16px;padding:0 16px;margin-top:8px}
+.btn.lnk{min-height:44px;background:none;color:var(--brand);padding:0 8px;text-decoration:underline;font-size:16px}
+.hero{background:var(--brand);color:#fff;border-radius:22px;padding:22px}
+.hero .n{font-size:clamp(38px,11vw,60px);font-weight:700;line-height:1.05;margin:4px 0 14px}
+.bar{height:12px;border-radius:9px;background:rgba(255,255,255,.25);overflow:hidden}.bar i{display:block;height:100%;background:#7FE0A8}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:14px 0}
+.acoes{display:grid;gap:12px;margin:14px 0}
+@media(min-width:760px){.grid{grid-template-columns:repeat(3,1fr)}.acoes{grid-template-columns:1fr 1fr}}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px}
+.card span{color:var(--mute);font-size:16px}.card b{display:block;font-size:24px}
+.chip{display:inline-block;padding:3px 10px;border-radius:99px;font-size:15px;font-weight:700;white-space:nowrap}
+.chip.ok{background:var(--okb);color:var(--ok)}.chip.wa{background:var(--wab);color:var(--wa)}.chip.pa{background:var(--pab);color:var(--pa)}.chip.cx{background:#E6E8EA;color:#444}
+table{width:100%;border-collapse:collapse;background:var(--card);border-radius:14px;overflow:hidden}
+th,td{padding:12px;text-align:left;border-bottom:1px solid var(--line)}
+th{font-size:15px;color:var(--mute)}.r{text-align:right}
+tr[data-act]{cursor:pointer}tr[data-act]:hover{background:#F6F9FA}
+@media(max-width:700px){thead{display:none}table,tbody{display:block;background:none}tr{display:block;background:var(--card);border:1px solid var(--line);border-radius:14px;margin-bottom:10px;padding:6px 0}td{display:flex;justify-content:space-between;gap:12px;border:0;padding:6px 14px;text-align:right}td::before{content:attr(data-label);color:var(--mute);text-align:left}}
+.filtros{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.filtros .full{grid-column:1/-1}
+@media(min-width:760px){.filtros{grid-template-columns:repeat(4,1fr)}.filtros .full{grid-column:span 2}}
+label{display:block;margin:12px 0 4px;font-weight:700;font-size:16px}.filtros label{margin:0 0 4px}
+input,select,textarea{width:100%;min-height:52px;font:inherit;border:2px solid var(--line);border-radius:12px;padding:10px 12px;background:var(--card);color:var(--ink)}
+nav{position:fixed;left:0;right:0;bottom:0;background:var(--card);border-top:1px solid var(--line);display:flex;padding-bottom:env(safe-area-inset-bottom);z-index:5}
+nav button{flex:1;min-height:64px;border:0;background:none;font-family:inherit;font-size:15px;color:var(--mute);cursor:pointer}
+nav button.on{color:var(--brand);font-weight:700;box-shadow:inset 0 3px var(--brand)}
+.ov{position:fixed;inset:0;background:rgba(16,34,43,.55);display:flex;align-items:flex-end;justify-content:center;z-index:20;overflow:auto}
+.box{background:var(--card);width:100%;max-width:560px;border-radius:22px 22px 0 0;padding:22px;max-height:94vh;overflow:auto}
+@media(min-width:700px){.ov{align-items:center}.box{border-radius:22px}}
+.box h2{margin-top:0}.btns{display:flex;gap:12px;margin-top:18px}.btns .btn{flex:1}
+ul{padding-left:20px;margin:8px 0}#prev ul{max-height:28vh;overflow:auto}
+details.card{margin-bottom:10px}summary{cursor:pointer;min-height:44px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.toast{position:fixed;left:12px;right:12px;top:12px;max-width:560px;margin:auto;background:var(--ink);color:#fff;padding:14px 16px;border-radius:12px;z-index:50}.toast.er{background:var(--er)}
+.riscado{text-decoration:line-through;color:var(--mute)}
+html{scroll-behavior:smooth}
+.btns{flex-wrap:wrap}.btns .btn{min-width:130px}
+.card.ok{border-top:4px solid var(--ok)}.card.wa{border-top:4px solid #E0A030}.card.pa{border-top:4px solid var(--pa)}
+@media(min-width:701px){tr[data-s=pago] td:first-child{box-shadow:inset 5px 0 var(--ok)}tr[data-s=parcial] td:first-child{box-shadow:inset 5px 0 var(--pa)}tr[data-s=pendente] td:first-child{box-shadow:inset 5px 0 #E0A030}}
+@media(max-width:700px){tr[data-s=pago]{border-left:5px solid var(--ok)}tr[data-s=parcial]{border-left:5px solid var(--pa)}tr[data-s=pendente]{border-left:5px solid #E0A030}}
+.atalhos{display:flex;gap:10px;flex-wrap:wrap;margin:6px 0 4px}.atalhos .btn{min-height:48px;font-size:15px;flex:1;padding:0 12px}
+@media(min-width:900px){nav{top:0;bottom:auto;border-top:0;border-bottom:1px solid var(--line);justify-content:center}nav button{flex:0 0 200px;min-height:60px;font-size:16px;box-shadow:none}nav button.on{box-shadow:inset 0 -3px var(--brand)}.wrap{padding:84px 16px 40px}}
+@media print{nav,.noprint,.btn{display:none!important}body,table,tr,.card{background:var(--card)!important;color:#000!important}.wrap{padding:0}}
 
--- =====================================================================
--- CONTROLE DE ABASTECIMENTOS - BANCO DE DADOS (SUPABASE / POSTGRES)
--- Como usar: Supabase > SQL Editor > New query > cole TUDO > Run.
--- Pode rodar de novo sem medo (os comandos são repetíveis).
--- IMPORTANTE: este arquivo NÃO contém o token do Telegram. Veja o passo 9.
--- =====================================================================
+@media(prefers-color-scheme:dark){:root{--bg:#0E1A20;--card:#16262E;--ink:#E8F0F3;--mute:#9DB0B9;--brand:#4FB3D9;--line:#2A3E48;--ok:#5FD39A;--okb:#12362A;--wa:#F0B45A;--wab:#3A2C10;--pa:#7DB6F2;--pab:#14304D;--er:#FF8A80}.btn{color:#06222E}.hero{background:#0B4F6C;color:#fff}.chip.cx{background:#2A3338;color:#ccc}tr[data-act]:hover{background:#1B2F38}.ov{background:rgba(0,0,0,.65)}.toast{background:#E8F0F3;color:#10222B}}
+@keyframes up{from{transform:translateY(24px);opacity:0}}.box,.toast{animation:up .22s ease}.btn:active{transform:scale(.98)}.card[data-act]{cursor:pointer;transition:box-shadow .15s}.card[data-act]:hover{box-shadow:0 4px 14px rgba(0,0,0,.15)}
+.graf{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;height:150px;margin-bottom:8px}.graf>div{display:flex;flex-direction:column;text-align:center;min-width:0}.cols{flex:1;display:flex;align-items:flex-end;justify-content:center;gap:4px}.cols i{width:40%;max-width:26px;min-height:2px;border-radius:6px 6px 0 0}.ga{background:var(--brand)}.gp{background:var(--ok)}.dot{display:inline-block;width:10px;height:10px;border-radius:3px;vertical-align:middle}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div id="app"><p class="vazio">Carregando...</p></div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<script>
+/* ============ CONFIGURAÇÃO (preencha com os dados do seu projeto Supabase) ============
+   Supabase > Project Settings > API. A chave "anon public" pode ficar aqui: os dados são
+   protegidos pelo login e pelas regras do banco. NUNCA coloque a chave "service_role" aqui. */
+const CFG = { url: 'https://mkzkasgaxzpynrhrgmrt.supabase.co', key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1remthc2dheHpweW5yaHJnbXJ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA2NDQxNDYsImV4cCI6MjEwNjIyMDE0Nn0.Aax_OwDl4HZHMbN0LAqmGQvd9OqA_simRLWxBmINJCk' };
 
--- 1) EXTENSÃO PARA ENVIAR MENSAGENS AO TELEGRAM (feito pelo banco, não pelo site)
-create extension if not exists pg_net with schema extensions;
+/* ============ utilidades ============ */
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const R = n => Number(n || 0).toLocaleString('pt-BR', {style:'currency', currency:'BRL'});
+const D = d => d ? d.split('-').reverse().join('/') : '';
+const hoje = () => { const d = new Date(); return new Date(d - d.getTimezoneOffset()*6e4).toISOString().slice(0,10); };
+const cents = n => Math.round(Number(n || 0) * 100);
+const sum = (l, k) => l.reduce((s, x) => s + cents(x[k]), 0) / 100;
+const uid = () => crypto.randomUUID ? crypto.randomUUID() : 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => { const r = Math.random()*16|0; return (c=='x' ? r : r&3|8).toString(16); });
+function num(s) { // aceita 1.500,00 / 1500,50 / 1500.5 / 1500
+  s = String(s || '').trim().replace(/[R$\s]/g, ''); if (!s) return NaN;
+  if (s.includes(',')) s = s.replace(/\./g, '').replace(',', '.');
+  else if (!/^\d+\.\d{1,2}$/.test(s)) s = s.replace(/\./g, '');
+  return Number(s);
+}
+const dias = d => Math.max(0, Math.round((new Date(hoje()) - new Date(d)) / 864e5));
+const idade = x => x.cancelado || x.situacao == 'pago' || !dias(x.data) ? '' : `<br><small>há ${dias(x.data)} dia${dias(x.data) > 1 ? 's' : ''}</small>`;
+const CHIP = {pago:['ok','Pago'], parcial:['pa','Parcialmente pago'], pendente:['wa','Pendente'], cancelado:['cx','Removido']};
+const chip = s => `<span class="chip ${CHIP[s][0]}">${CHIP[s][1]}</span>`;
 
--- 2) USUÁRIOS E PERMISSÕES
--- papel: 'admin' (registra tudo), 'leitura' (só consulta), 'bloqueado' (sem acesso)
-create table if not exists public.perfis (
-  user_id   uuid primary key references auth.users(id) on delete cascade,
-  nome      text,
-  papel     text not null default 'bloqueado' check (papel in ('admin','leitura','bloqueado')),
-  criado_em timestamptz not null default now()
-);
+/* ============ estado ============ */
+let sb;
+const S = {user:null, papel:'', nome:'', tab:'inicio', abs:[], pgs:[], als:[], f:{de:'',ate:'',pessoa:'',veiculo:'',sit:'',q:'',ord:'asc'}, r:{de:'',ate:''}};
+const adm = () => S.papel === 'admin';
+const ativos = () => S.abs.filter(x => !x.cancelado);
+const fifo = () => ativos().filter(x => cents(x.pendente) > 0).sort((a,b) => a.data<b.data?-1 : a.data>b.data?1 : a.criado_em<b.criado_em?-1 : a.criado_em>b.criado_em?1 : a.id<b.id?-1:1);
 
--- O PRIMEIRO usuário criado vira admin. Os seguintes entram como 'bloqueado'
--- até você liberar (passo 8). Assim, ninguém de fora enxerga os dados.
-create or replace function public.novo_usuario() returns trigger
-language plpgsql security definer set search_path = public as $f$
-begin
-  insert into public.perfis(user_id, nome, papel)
-  values (new.id,
-          coalesce(new.raw_user_meta_data->>'nome', split_part(new.email,'@',1)),
-          case when exists (select 1 from public.perfis) then 'bloqueado' else 'admin' end);
-  return new;
-end $f$;
+const msg = e => { const s = String(e?.message || e || '').replace(/^Aviso:\s*/, ''); return s.charAt(0).toUpperCase() + s.slice(1); };
+// dinheiro de pagamentos válidos que ainda não está em nenhum abastecimento ativo
+const credito = () => { const ok = S.pgs.filter(p => !p.estornado), ids = new Set(ok.map(p => p.id)), canc = new Set(S.abs.filter(a => a.cancelado).map(a => a.id));
+  return (cents(sum(ok,'valor')) - S.als.filter(a => ids.has(a.pagamento_id) && !canc.has(a.abastecimento_id)).reduce((s,a) => s + cents(a.valor), 0)) / 100; };
 
-drop trigger if exists ao_criar_usuario on auth.users;
-create trigger ao_criar_usuario after insert on auth.users
-  for each row execute function public.novo_usuario();
+/* ============ avisos e janelas ============ */
+function toast(m, er) { const t = document.createElement('div'); t.className = 'toast' + (er ? ' er' : ''); t.setAttribute('role','status'); t.textContent = m; document.body.appendChild(t); setTimeout(() => t.remove(), er ? 7000 : 3500); }
+function modal(html) { const o = document.createElement('div'); o.className = 'ov'; o.innerHTML = `<div class="box" role="dialog">${html}</div>`; document.body.appendChild(o); o.close = () => o.remove(); o.addEventListener('click', e => { if (e.target === o) o.remove(); }); return o; }
+function ask(t, msg, ok = 'Confirmar') { return new Promise(r => { const o = modal(`<h2>${t}</h2><p>${msg}</p><div class="btns"><button class="btn sec" data-r="0">Voltar</button><button class="btn" data-r="1">${ok}</button></div>`); o.addEventListener('click', e => { const b = e.target.closest('[data-r]'); if (b || e.target === o) { o.remove(); r(!!b && b.dataset.r == 1); } }); }); }
+async function run(b, fn) { const t = b.textContent; b.disabled = true; b.textContent = 'Aguarde...'; try { await fn(); } catch (e) { toast(msg(e) || 'Algo deu errado. Tente de novo.', 1); } finally { if (b.isConnected) { b.disabled = false; b.textContent = t; } } }
 
-create or replace function public.papel_atual() returns text
-language sql stable security definer set search_path = public as $f$
-  select papel from public.perfis where user_id = auth.uid()
-$f$;
-create or replace function public.eh_autorizado() returns boolean
-language sql stable security definer set search_path = public as $f$
-  select coalesce(public.papel_atual() in ('admin','leitura'), false)
-$f$;
-create or replace function public.eh_admin() returns boolean
-language sql stable security definer set search_path = public as $f$
-  select coalesce(public.papel_atual() = 'admin', false)
-$f$;
+/* ============ dados ============ */
+async function all(q) { let o = [], f = 0; for (;;) { const {data, error} = await q().range(f, f + 999); if (error) throw error; o = o.concat(data); if (data.length < 1000) break; f += 1000; } return o; }
+async function carregar() {
+  try {
+    [S.abs, S.pgs, S.als] = await Promise.all([
+      all(() => sb.from('v_abastecimentos').select('*').order('data').order('criado_em').order('id')),
+      all(() => sb.from('pagamentos').select('*').order('data', {ascending:false}).order('criado_em', {ascending:false}).order('id')),
+      all(() => sb.from('alocacoes').select('*').order('id'))]);
+  } catch (e) { toast('Não foi possível carregar os dados: ' + e.message, 1); }
+  render();
+}
+async function entrar(u) {
+  S.user = u;
+  const {data} = await sb.from('perfis').select('*').eq('user_id', u.id).maybeSingle();
+  S.papel = data?.papel || ''; S.nome = data?.nome || u.email;
+  if (['admin','leitura'].includes(S.papel)) { await carregar(); aoVivo(); } else render();
+}
 
--- 3) CONFIGURAÇÕES PRIVADAS (token do Telegram). Ninguém pelo site consegue ler.
-create table if not exists public.app_config (
-  chave text primary key,
-  valor text not null
-);
-alter table public.app_config enable row level security;   -- sem políticas = fechado
-insert into public.app_config(chave, valor) values
-  ('telegram_token',    'COLE_AQUI_O_TOKEN'),
-  ('telegram_chat_ids', 'COLE_AQUI_O_ID')
-on conflict (chave) do nothing;
+let canal;
+function aoVivo() { // atualiza sozinho quando algo é registrado (inclusive pelo Telegram)
+  if (canal || !sb) return; let t;
+  const f = () => { clearTimeout(t); t = setTimeout(() => { if (S.user && !document.querySelector('.ov')) carregar(); }, 800); };
+  canal = sb.channel('ao-vivo'); ['abastecimentos','pagamentos','alocacoes'].forEach(tb => canal.on('postgres_changes', {event:'*', schema:'public', table:tb}, f)); canal.subscribe();
+}
 
--- 4) TABELAS PRINCIPAIS (sem horário: só a data)
-create table if not exists public.abastecimentos (
-  id          uuid primary key default gen_random_uuid(),
-  numero      integer generated always as identity,
-  data        date not null,
-  pessoa      text not null check (length(trim(pessoa)) > 0),
-  veiculo     text not null check (length(trim(veiculo)) > 0),
-  placa       text,
-  valor       numeric(14,2) not null check (valor > 0),
-  observacoes text,
-  cancelado   boolean not null default false,
-  criado_em   timestamptz not null default now(),
-  criado_por  uuid default auth.uid()
-);
+/* ============ telas ============ */
+function login() {
+  $('#app').innerHTML = `<div class="wrap" style="max-width:460px;padding-top:8vh"><h1>Controle de Abastecimentos</h1><p class="mute">Entre com seu e-mail e senha.</p>
+  ${CFG.url.includes('COLE') ? '<div class="card erro">Falta configurar a URL e a chave do Supabase no começo do arquivo index.html.</div>' : ''}
+  <label>E-mail<input id="em" type="email" autocomplete="username"></label><label>Senha<input id="sn" type="password" autocomplete="current-password"></label>
+  <div class="btns"><button class="btn" id="go">Entrar</button></div></div>`;
+  $('#go').onclick = e => run(e.target, async () => {
+    if (!sb) throw new Error('Configuração do Supabase pendente.');
+    const {data, error} = await sb.auth.signInWithPassword({email:$('#em').value.trim(), password:$('#sn').value});
+    if (error) throw new Error('E-mail ou senha incorretos.');
+    await entrar(data.user);
+  });
+  $('#sn').onkeydown = e => { if (e.key == 'Enter') $('#go').click(); };
+}
 
-create table if not exists public.pagamentos (
-  id             uuid primary key default gen_random_uuid(),
-  chave          uuid not null unique,          -- impede pagamento duplicado
-  data           date not null,
-  valor          numeric(14,2) not null check (valor > 0),
-  forma          text not null check (forma in ('Pix','Dinheiro','Transferência')),
-  observacao     text,
-  estornado      boolean not null default false,
-  estornado_em   timestamptz,
-  motivo_estorno text,
-  criado_em      timestamptz not null default now(),
-  criado_por     uuid default auth.uid()
-);
+function render() {
+  if (!S.user) return login();
+  if (!['admin','leitura'].includes(S.papel)) { $('#app').innerHTML = `<div class="wrap"><div class="card"><h2>Acesso ainda não liberado</h2><p>Peça ao administrador para liberar o seu acesso.</p><button class="btn" data-act="sair">Sair</button></div></div>`; return; }
+  const t = S.tab, tabs = [['inicio','Início'],['abs','Abastecimentos'],['pgs','Pagamentos'],['rel','Relatórios']];
+  $('#app').innerHTML = `<div class="wrap"><header><div><h1>Abastecimentos</h1><small>${esc(S.nome)}${adm() ? '' : ' (somente consulta)'}</small></div><div class="noprint"><button class="btn lnk" data-act="atualizar">Atualizar</button><button class="btn lnk" data-act="sair">Sair</button></div></header>
+  ${t=='inicio' ? inicio() : t=='abs' ? absTab() : t=='pgs' ? pgsTab() : relTab()}</div>
+  <nav>${tabs.map(([k,n]) => `<button data-act="aba" data-t="${k}" class="${t==k?'on':''}">${n}</button>`).join('')}</nav>`;
+  if (t == 'abs') listaAbs();
+}
 
--- Como cada pagamento foi distribuído entre os abastecimentos (FIFO)
-create table if not exists public.alocacoes (
-  id               uuid primary key default gen_random_uuid(),
-  pagamento_id     uuid not null references public.pagamentos(id)     on delete restrict,
-  abastecimento_id uuid not null references public.abastecimentos(id) on delete restrict,
-  valor            numeric(14,2) not null check (valor > 0),
-  criado_em        timestamptz not null default now()
-);
-create index if not exists ix_aloc_abast on public.alocacoes(abastecimento_id);
-create index if not exists ix_aloc_pag   on public.alocacoes(pagamento_id);
-create index if not exists ix_abast_data on public.abastecimentos(data, criado_em);
+function inicio() {
+  const a = ativos(), tot = sum(a,'valor'), pago = sum(a,'pago'), pend = sum(a,'pendente');
+  const parc = a.filter(x => x.situacao == 'parcial').length, ult = S.pgs.find(p => !p.estornado);
+  const ant = fifo().slice(0, 5), cred = credito(), nS = k => a.filter(x => x.situacao == k).length;
+  return `<div class="hero"><div>Falta pagar</div><div class="n">${R(pend)}</div><div class="bar"><i style="width:${tot ? Math.min(100, pago/tot*100) : 0}%"></i></div><div style="margin-top:8px">${R(pago)} pagos de ${R(tot)} (${tot ? Math.round(pago/tot*100) : 0}%)${ant[0] ? ` · mais antiga há ${dias(ant[0].data)} dia(s)` : ''}</div></div>
+  ${adm() ? `<div class="acoes"><button class="btn" data-act="novoab">Novo abastecimento</button><button class="btn sec" data-act="pagar">Registrar pagamento</button></div>` : ''}
+  <div class="grid"><div class="card"><span>Total abastecido</span><b>${R(tot)}</b></div><div class="card ok"><span>Total pago</span><b>${R(pago)}</b></div><div class="card wa"><span>Saldo pendente</span><b>${R(pend)}</b></div>
+  <div class="card"><span>Abastecimentos</span><b>${a.length}</b></div><div class="card pa"><span>Parcialmente pagos</span><b>${parc}</b></div>
+  <div class="card"><span>Último pagamento</span><b>${ult ? R(ult.valor) : '-'}</b>${ult ? `<small>em ${D(ult.data)}</small>` : ''}</div>${cred > 0 ? `<div class="card ok"><span>Crédito guardado</span><b>${R(cred)}</b><small>abate as próximas dívidas</small></div>` : ''}</div>
+  <div class="atalhos noprint"><button class="btn sec" data-act="filtro" data-s="pendente">Pendentes (${nS('pendente')})</button><button class="btn sec" data-act="filtro" data-s="parcial">Parciais (${nS('parcial')})</button><button class="btn sec" data-act="filtro" data-s="pago">Pagos (${nS('pago')})</button></div>
+  ${grafico()}${devedores()}<h2>Dívidas mais antigas</h2>${ant.length ? tabela(ant) : '<p class="vazio">Nada pendente. Tudo pago.</p>'}
+  ${adm() ? '<p class="noprint"><button class="btn lnk" data-act="testar">Testar aviso do Telegram</button><br><small>No Telegram: /abastecimento, /pagamento, /status, /pendentes e /ultimos.</small></p>' : ''}`;
+}
 
--- Registro de tudo que foi criado/alterado (auditoria)
-create table if not exists public.historico (
-  id          bigint generated always as identity primary key,
-  tabela      text not null,
-  registro_id uuid not null,
-  acao        text not null,
-  antes       jsonb,
-  depois      jsonb,
-  usuario     uuid default auth.uid(),
-  criado_em   timestamptz not null default now()
-);
-create index if not exists ix_hist_reg on public.historico(registro_id);
+function grafico() {
+  const d0 = new Date(hoje() + 'T00:00'), ms = [];
+  for (let i = 5; i >= 0; i--) { const d = new Date(d0.getFullYear(), d0.getMonth() - i, 1); ms.push(d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0')); }
+  const v = ms.map(m => [sum(ativos().filter(x => x.data.startsWith(m)), 'valor'), sum(S.pgs.filter(p => !p.estornado && p.data.startsWith(m)), 'valor')]);
+  const mx = Math.max(1, ...v.flat()), nome = m => new Date(m + '-15T00:00').toLocaleDateString('pt-BR', {month:'short'}).replace('.', '');
+  return `<h2>Últimos 6 meses</h2><div class="card"><div class="graf">${ms.map((m, i) => `<div><div class="cols"><i class="ga" style="height:${v[i][0]/mx*100}%" title="Abastecido: ${R(v[i][0])}"></i><i class="gp" style="height:${v[i][1]/mx*100}%" title="Pago: ${R(v[i][1])}"></i></div><small>${nome(m)}</small></div>`).join('')}</div><small><span class="dot ga"></span> Abastecido &nbsp; <span class="dot gp"></span> Pago &nbsp; (passe o mouse ou toque nas barras para ver o valor)</small></div>`;
+}
+function devedores() {
+  const m = {}; ativos().forEach(x => { if (cents(x.pendente) > 0) m[x.pessoa] = (m[x.pessoa] || 0) + cents(x.pendente); });
+  const l = Object.entries(m).sort((a, b) => b[1] - a[1]).slice(0, 3);
+  return l.length ? `<h2>Maiores saldos pendentes</h2><div class="grid">${l.map(([n, c]) => `<div class="card wa" data-act="pessoa" data-n="${esc(n)}"><span>${esc(n)}</span><b>${R(c / 100)}</b></div>`).join('')}</div>` : '';
+}
 
-create or replace function public.auditar() returns trigger
-language plpgsql security definer set search_path = public as $f$
-begin
-  insert into public.historico(tabela, registro_id, acao, antes, depois)
-  values (tg_table_name, coalesce(new.id, old.id), tg_op,
-          case when tg_op <> 'INSERT' then to_jsonb(old) end,
-          case when tg_op <> 'DELETE' then to_jsonb(new) end);
-  return coalesce(new, old);
-end $f$;
+function tabela(l) {
+  return `<table><thead><tr><th>Data<th>Pessoa<th>Veículo<th class="r">Valor original<th class="r">Valor pago<th class="r">Falta pagar<th>Situação</thead><tbody>${l.map(x => `<tr data-act="ab" data-id="${x.id}" data-s="${x.situacao}"><td data-label="Data">${D(x.data)}${idade(x)}<td data-label="Pessoa">${esc(x.pessoa)}<td data-label="Veículo">${esc(x.veiculo)}${x.placa ? ' <small>' + esc(x.placa) + '</small>' : ''}<td data-label="Valor original" class="r">${R(x.valor)}<td data-label="Valor pago" class="r">${R(x.pago)}<td data-label="Falta pagar" class="r"><b>${R(x.pendente)}</b><td data-label="Situação">${chip(x.situacao)}`).join('')}</tbody></table>`;
+}
 
-drop trigger if exists aud_abast on public.abastecimentos;
-create trigger aud_abast after insert or update or delete on public.abastecimentos
-  for each row execute function public.auditar();
-drop trigger if exists aud_pag on public.pagamentos;
-create trigger aud_pag after insert or update or delete on public.pagamentos
-  for each row execute function public.auditar();
+const uniq = k => [...new Set(S.abs.map(x => x[k]).filter(Boolean))].sort((a,b) => a.localeCompare(b,'pt-BR'));
+function absTab() {
+  const f = S.f, op = (l, v) => `<option value="">Todos</option>` + l.map(x => `<option ${x==v?'selected':''}>${esc(x)}</option>`).join('');
+  return `<h2>Abastecimentos</h2><div class="filtros noprint">
+  <div class="full"><label>Buscar por nome, placa ou número<input data-f="q" value="${esc(f.q)}" placeholder="Digite aqui"></label></div>
+  <label>De<input type="date" data-f="de" value="${f.de}"></label><label>Até<input type="date" data-f="ate" value="${f.ate}"></label>
+  <label>Pessoa<select data-f="pessoa">${op(uniq('pessoa'), f.pessoa)}</select></label><label>Veículo<select data-f="veiculo">${op(uniq('veiculo'), f.veiculo)}</select></label>
+  <label>Situação<select data-f="sit">${['','pendente','parcial','pago','cancelado'].map(s => `<option value="${s}" ${f.sit==s?'selected':''}>${s ? CHIP[s][1] : 'Todas'}</option>`).join('')}</select></label>
+  <label>Ordem<select data-f="ord"><option value="asc" ${f.ord=='asc'?'selected':''}>Mais antigo primeiro</option><option value="desc" ${f.ord=='desc'?'selected':''}>Mais novo primeiro</option></select></label></div>
+  ${adm() ? '<div class="acoes noprint"><button class="btn" data-act="novoab">Novo abastecimento</button></div>' : ''}<div id="lista"></div>`;
+}
+function listaAbs() {
+  const f = S.f, q = f.q.trim().toLowerCase();
+  const l = S.abs.filter(x => (f.sit == 'cancelado' ? x.cancelado : !x.cancelado) && (!f.de || x.data >= f.de) && (!f.ate || x.data <= f.ate) && (!f.pessoa || x.pessoa == f.pessoa) && (!f.veiculo || x.veiculo == f.veiculo) && (!f.sit || f.sit == 'cancelado' || x.situacao == f.sit) && (!q || [x.pessoa, x.veiculo, x.placa, x.numero].join(' ').toLowerCase().includes(q)))
+    .sort((a,b) => (a.data < b.data ? -1 : a.data > b.data ? 1 : 0) * (f.ord == 'asc' ? 1 : -1));
+  $('#lista').innerHTML = l.length ? tabela(l) + `<p class="mute">${l.length} abastecimento(s). Falta pagar neste filtro: <b>${R(sum(l.filter(x => !x.cancelado),'pendente'))}</b></p>` : '<p class="vazio">Nenhum abastecimento encontrado.</p>';
+}
 
--- 5) VISÃO COM OS SALDOS (pago, pendente e situação de cada abastecimento)
-create or replace view public.v_abastecimentos with (security_invoker = true) as
-select a.*,
-       coalesce(p.pago, 0)                 as pago,
-       a.valor - coalesce(p.pago, 0)       as pendente,
-       case when a.cancelado                  then 'cancelado'
-            when coalesce(p.pago,0) >= a.valor then 'pago'
-            when coalesce(p.pago,0) > 0        then 'parcial'
-            else 'pendente' end            as situacao
-from public.abastecimentos a
-left join lateral (
-  select sum(al.valor) as pago
-  from public.alocacoes al
-  join public.pagamentos pg on pg.id = al.pagamento_id
-  where al.abastecimento_id = a.id and not pg.estornado
-) p on true;
+function pgsTab() {
+  return `<h2>Pagamentos</h2>${adm() ? '<div class="acoes"><button class="btn sec" data-act="pagar">Registrar pagamento</button></div>' : ''}` + (S.pgs.length ? S.pgs.map(p => {
+    const als = S.als.filter(a => a.pagamento_id == p.id);
+    return `<details class="card"><summary><b class="${p.estornado ? 'riscado' : ''}">${R(p.valor)}</b> em ${D(p.data)}, ${esc(p.forma)} ${p.estornado ? '<span class="chip wa">Estornado</span>' : ''}</summary>
+    ${p.observacao ? `<p>${esc(p.observacao)}</p>` : ''}<p class="mute">Como o dinheiro foi distribuído:</p><ul>${als.map(a => { const x = S.abs.find(y => y.id == a.abastecimento_id) || {}; return `<li>${R(a.valor)} para o abastecimento nº ${x.numero} de ${D(x.data)} (${esc(x.pessoa)})${x.cancelado ? ' - removido' : ''}</li>`; }).join('')}</ul>
+    <p>Total distribuído: <b>${R(sum(als,'valor'))}</b></p>${adm() && !p.estornado ? `<button class="btn sec peq" data-act="estornar" data-id="${p.id}">Estornar pagamento</button>` : ''}</details>`;
+  }).join('') : '<p class="vazio">Nenhum pagamento registrado ainda.</p>');
+}
 
--- 6) SEGURANÇA: o site só LÊ as tabelas; toda escrita passa pelas funções abaixo
-alter table public.perfis          enable row level security;
-alter table public.abastecimentos  enable row level security;
-alter table public.pagamentos      enable row level security;
-alter table public.alocacoes       enable row level security;
-alter table public.historico       enable row level security;
+function relTab() {
+  const {de, ate} = S.r, inP = d => (!de || d >= de) && (!ate || d <= ate);
+  const a = ativos().filter(x => inP(x.data)), p = S.pgs.filter(x => !x.estornado && inP(x.data));
+  const grp = k => { const m = {}; a.forEach(x => { const g = m[x[k]] ||= {n:0, v:[], }; g.n++; g.v.push(x); }); return Object.entries(m).sort((x,y) => sum(y[1].v,'valor') - sum(x[1].v,'valor')).map(([n,g]) => `<tr ${k == 'pessoa' ? `data-act="pessoa" data-n="${esc(n)}"` : ''}><td data-label="Nome">${esc(n)}<td data-label="Quantidade" class="r">${g.n}<td data-label="Total abastecido" class="r">${R(sum(g.v,'valor'))}<td data-label="Falta pagar" class="r">${R(sum(g.v,'pendente'))}`).join(''); };
+  const tb = k => `<table><thead><tr><th>Nome<th class="r">Quantidade<th class="r">Total abastecido<th class="r">Falta pagar</thead><tbody>${grp(k) || '<tr><td>Nada no período'}</tbody></table>`;
+  const nq = fifo();
+  return `<h2>Relatórios</h2><div class="filtros noprint"><label>Período: de<input type="date" data-r="de" value="${de}"></label><label>até<input type="date" data-r="ate" value="${ate}"></label></div>
+  <div class="grid"><div class="card"><span>Abastecido no período</span><b>${R(sum(a,'valor'))}</b></div><div class="card"><span>Pago no período</span><b>${R(sum(p,'valor'))}</b></div><div class="card"><span>Falta pagar agora (total)</span><b>${R(sum(ativos(),'pendente'))}</b></div></div>
+  <div class="acoes noprint"><button class="btn sec" data-act="csvab">Baixar abastecimentos (planilha)</button><button class="btn sec" data-act="csvpg">Baixar pagamentos (planilha)</button><button class="btn sec" data-act="imprimir">Imprimir relatório</button></div>
+  <h2>Por pessoa</h2>${tb('pessoa')}<h2>Por veículo</h2>${tb('veiculo')}
+  <h2>Pagamentos do período</h2>${p.length ? `<table><thead><tr><th>Data<th class="r">Valor<th>Forma<th>Observação</thead><tbody>${p.map(x => `<tr><td data-label="Data">${D(x.data)}<td data-label="Valor" class="r">${R(x.valor)}<td data-label="Forma">${esc(x.forma)}<td data-label="Observação">${esc(x.observacao || '-')}`).join('')}</tbody></table>` : '<p class="vazio">Nenhum pagamento no período.</p>'}
+  <h2>Dívidas ainda não quitadas (mais antigas primeiro)</h2>${nq.length ? tabela(nq) : '<p class="vazio">Nada pendente.</p>'}`;
+}
 
-drop policy if exists ler_perfil  on public.perfis;
-create policy ler_perfil  on public.perfis         for select to authenticated using (user_id = auth.uid());
-drop policy if exists ler_abast   on public.abastecimentos;
-create policy ler_abast   on public.abastecimentos for select to authenticated using (public.eh_autorizado());
-drop policy if exists ler_pag     on public.pagamentos;
-create policy ler_pag     on public.pagamentos     for select to authenticated using (public.eh_autorizado());
-drop policy if exists ler_aloc    on public.alocacoes;
-create policy ler_aloc    on public.alocacoes      for select to authenticated using (public.eh_autorizado());
-drop policy if exists ler_hist    on public.historico;
-create policy ler_hist    on public.historico      for select to authenticated using (public.eh_autorizado());
+/* ============ formulários ============ */
+function formAb(a) {
+  const dl = (id, k) => `<datalist id="${id}">${uniq(k).map(x => `<option value="${esc(x)}">`).join('')}</datalist>`;
+  const o = modal(`<h2>${a ? 'Corrigir abastecimento' : 'Novo abastecimento'}</h2>
+  <label>Pessoa que abasteceu<input id="fp" list="lp" value="${esc(a?.pessoa)}" autocomplete="off"></label>${dl('lp','pessoa')}
+  <label>Veículo<input id="fv" list="lv" value="${esc(a?.veiculo)}" placeholder="Ex.: Caminhão 01" autocomplete="off"></label>${dl('lv','veiculo')}
+  <label>Placa (se tiver)<input id="fl" value="${esc(a?.placa)}" autocapitalize="characters"></label>
+  <label>Data do abastecimento<input id="fd" type="date" value="${a?.data || hoje()}"></label>
+  <label>Valor total<input id="fr" inputmode="decimal" placeholder="0,00" value="${a ? String(a.valor).replace('.', ',') : ''}"></label>
+  <label>Observações (opcional)<textarea id="fo" rows="2">${esc(a?.observacoes)}</textarea></label>
+  <div class="btns"><button class="btn sec" id="cx">Cancelar</button><button class="btn" id="ok">Salvar</button></div>`);
+  $('#cx').onclick = () => o.close();
+  $('#ok').onclick = e => {
+    const v = num($('#fr').value), p = $('#fp').value.trim(), ve = $('#fv').value.trim();
+    if (!p || !ve) return toast('Preencha a pessoa e o veículo.', 1);
+    if (!$('#fd').value) return toast('Informe a data.', 1);
+    if (!(v > 0)) return toast('Informe um valor maior que zero.', 1);
+    const args = {p_data:$('#fd').value, p_pessoa:p, p_veiculo:ve, p_placa:$('#fl').value.trim(), p_valor:v, p_obs:$('#fo').value.trim()};
+    run(e.target, async () => {
+      const {error} = a ? await sb.rpc('editar_abastecimento', {p_id:a.id, ...args}) : await sb.rpc('registrar_abastecimento', args);
+      if (error) throw error;
+      o.close(); toast(a ? 'Abastecimento corrigido.' : 'Abastecimento salvo.'); await carregar();
+    });
+  };
+}
 
--- 7) FUNÇÕES (toda a regra financeira é validada AQUI, não no navegador)
-create or replace function public.brl(v numeric) returns text
-language sql immutable as $f$
-  select 'R$ ' || translate(to_char(v, 'FM999,999,999,990.00'), ',.', '.,')
-$f$;
+function formPag() {
+  const pend = sum(ativos(), 'pendente');
+  if (pend <= 0) return toast('Não há nada pendente para pagar.');
+  const chave = uid(); // a mesma chave vale para novas tentativas: impede baixa duplicada
+  const o = modal(`<h2>Registrar pagamento</h2><p class="mute">Falta pagar: <b>${R(pend)}</b></p>
+  <label>Valor do pagamento<input id="pv" inputmode="decimal" placeholder="0,00"></label><button class="btn sec peq" id="tudo">Pagar tudo (${R(pend)})</button>
+  <label>Data do pagamento<input id="pd" type="date" value="${hoje()}"></label>
+  <label>Forma de pagamento<select id="pf"><option>Pix<option>Dinheiro<option>Transferência</select></label>
+  <label>Observação (opcional)<textarea id="po" rows="2"></textarea></label><div id="prev"></div>
+  <div class="btns"><button class="btn sec" id="cx">Cancelar</button><button class="btn" id="ok" disabled>Registrar pagamento</button></div>`);
+  const prev = () => {
+    const v = num($('#pv').value), c = cents(v), tot = cents(pend); let h = '', ok = false;
+    if (!(v > 0)) h = '<p class="mute">Digite o valor para ver como ele será distribuído.</p>';
+    else if (c > tot) h = `<p class="erro">O valor é maior que a dívida total. O máximo é ${R(pend)}.</p>`;
+    else { let r = c, q = 0, pc = 0; const ls = [];
+      for (const x of fifo()) { if (r <= 0) break; const a = Math.min(r, cents(x.pendente)); r -= a; const falta = cents(x.pendente) - a; falta ? pc++ : q++;
+        ls.push(`<li>${D(x.data)} - ${esc(x.pessoa)}: ${R(a/100)} ${falta ? `(ainda falta ${R(falta/100)})` : '(quitado)'}</li>`); }
+      h = `<p><b>Como será distribuído</b> (do mais antigo ao mais novo): quita ${q}, parcial ${pc}</p><ul>${ls.join('')}</ul><p>Falta pagar depois: <b>${R((tot - c)/100)}</b></p>`; ok = !!$('#pd').value; }
+    $('#prev').innerHTML = h; $('#ok').disabled = !ok;
+  };
+  $('#pv').oninput = prev; $('#pd').onchange = prev; prev();
+  $('#tudo').onclick = () => { $('#pv').value = String(pend.toFixed(2)).replace('.', ','); prev(); };
+  $('#cx').onclick = () => o.close();
+  $('#ok').onclick = async e => {
+    const v = num($('#pv').value), f = $('#pf').value;
+    if (!await ask('Confirmar pagamento?', `Você vai registrar <b>${R(v)}</b> (${esc(f)}) em ${D($('#pd').value)}. Ele será distribuído automaticamente, do abastecimento mais antigo para o mais novo.`, 'Sim, registrar')) return;
+    run(e.target, async () => {
+      const {data, error} = await sb.rpc('registrar_pagamento', {p_chave:chave, p_data:$('#pd').value, p_valor:v, p_forma:f, p_obs:$('#po').value.trim()});
+      if (error) {
+        if (!String(error.message).startsWith('Aviso:')) await sb.rpc('notificar_erro', {p_msg: error.message}).catch(() => {});
+        throw new Error(String(error.message).replace(/^Aviso:\s*/, '') + (String(error.message).startsWith('Aviso:') ? '' : ' Confira a lista de pagamentos antes de tentar de novo.'));
+      }
+      o.close(); toast(data.repetido ? 'Este pagamento já estava registrado. Nada foi cobrado de novo.' : `Pagamento registrado. Falta pagar: ${R(data.saldo_pendente)}.`); await carregar();
+    });
+  };
+}
 
-create or replace function public.saldo_pendente() returns numeric
-language sql stable security definer set search_path = public as $f$
-  select coalesce(sum(pendente), 0) from public.v_abastecimentos where not cancelado
-$f$;
+async function detAb(id) {
+  const a = S.abs.find(x => x.id == id); if (!a) return;
+  const als = S.als.filter(x => x.abastecimento_id == id).map(x => ({...x, p:S.pgs.find(p => p.id == x.pagamento_id)})).filter(x => x.p && !x.p.estornado);
+  const o = modal(`<h2>Abastecimento nº ${a.numero}</h2><p>${chip(a.situacao)}</p>
+  <p><b>${esc(a.pessoa)}</b>, ${esc(a.veiculo)}${a.placa ? ' (' + esc(a.placa) + ')' : ''}<br>Data: ${D(a.data)}</p>
+  <p>Valor original: <b>${R(a.valor)}</b><br>Valor pago: <b>${R(a.pago)}</b><br>Falta pagar: <b>${R(a.pendente)}</b></p>${a.observacoes ? `<p>${esc(a.observacoes)}</p>` : ''}
+  <p class="mute">Pagamentos recebidos:</p>${als.length ? `<ul>${als.map(x => `<li>${R(x.valor)} do pagamento de ${D(x.p.data)}</li>`).join('')}</ul>` : '<p>Nenhum ainda.</p>'}
+  <p class="mute">Alterações:</p><div id="hist">Carregando...</div>
+  <div class="btns">${adm() && !a.cancelado ? '<button class="btn sec" id="ed">Corrigir</button><button class="btn sec" id="cn">Remover abastecimento</button>' : ''}<button class="btn" id="fc">Fechar</button></div>`);
+  $('#fc').onclick = () => o.close();
+  if ($('#ed')) { $('#ed').onclick = () => { o.close(); formAb(a); };
+    $('#cn').onclick = async () => { if (!await ask('Remover abastecimento?', `O abastecimento nº ${a.numero} (${R(a.valor)}) deixa de contar nos totais e sai da lista, mas fica guardado no histórico.${cents(a.pago) > 0 ? ` Ele já recebeu <b>${R(a.pago)}</b>: esse dinheiro não se perde. Ele passa para as próximas dívidas mais antigas (ou fica guardado como crédito).` : ''}`, 'Sim, remover')) return;
+      try { const {error} = await sb.rpc('cancelar_abastecimento', {p_id:a.id}); if (error) throw error; o.close(); toast('Abastecimento removido.'); await carregar(); } catch (e) { toast(msg(e), 1); } }; }
+  const {data} = await sb.from('historico').select('*').eq('registro_id', id).order('id');
+  const L = {data:'Data', pessoa:'Pessoa', veiculo:'Veículo', placa:'Placa', valor:'Valor', observacoes:'Observações', cancelado:'Removido'};
+  const fv = (k, v) => k == 'valor' ? R(v) : k == 'data' ? D(v) : k == 'cancelado' ? (v ? 'sim' : 'não') : (v || '-');
+  const h = (data || []).map(x => { const dt = new Date(x.criado_em).toLocaleDateString('pt-BR');
+    if (x.acao == 'INSERT') return `<li>${dt}: registrado</li>`;
+    const ch = Object.keys(L).filter(k => x.antes[k] !== x.depois[k]).map(k => `${L[k]}: ${esc(fv(k, x.antes[k]))} para ${esc(fv(k, x.depois[k]))}`);
+    return ch.length ? `<li>${dt}: ${ch.join('; ')}</li>` : ''; }).join('');
+  if ($('#hist')) $('#hist').innerHTML = h ? `<ul>${h}</ul>` : 'Sem alterações.';
+}
 
--- Envia mensagem ao Telegram (sem derrubar a operação se o Telegram falhar)
-create or replace function public.enviar_telegram(p_texto text) returns void
-language plpgsql security definer set search_path = public as $f$
-declare v_token text; v_ids text; v_id text;
-begin
-  select valor into v_token from public.app_config where chave = 'telegram_token';
-  select valor into v_ids   from public.app_config where chave = 'telegram_chat_ids';
-  if v_token is null or v_ids is null or v_token like 'COLE%' or v_ids like 'COLE%' then return; end if;
-  foreach v_id in array string_to_array(v_ids, ',') loop
-    perform net.http_post(
-      url     := 'https://api.telegram.org/bot' || v_token || '/sendMessage',
-      body    := jsonb_build_object('chat_id', trim(v_id), 'text', p_texto),
-      headers := '{"Content-Type":"application/json"}'::jsonb);
-  end loop;
-exception when others then
-  null;
-end $f$;
+/* ============ planilhas (CSV) e impressão ============ */
+function baixar(nome, linhas) {
+  const t = '\ufeff' + linhas.map(l => l.map(c => `"${String(c ?? '').replace(/"/g, '""')}"`).join(';')).join('\r\n');
+  const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([t], {type:'text/csv;charset=utf-8'})); a.download = `${nome}-${hoje()}.csv`; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+}
+const dec = n => Number(n).toFixed(2).replace('.', ',');
 
--- NOVO ABASTECIMENTO
-create or replace function public.registrar_abastecimento(
-  p_data date, p_pessoa text, p_veiculo text, p_placa text, p_valor numeric, p_obs text)
-returns uuid language plpgsql security definer set search_path = public as $f$
-declare v_id uuid; v_num int;
-begin
-  if not public.eh_admin() then raise exception 'Aviso: você não tem permissão para registrar.'; end if;
-  perform pg_advisory_xact_lock(7001);
-  if p_data is null then raise exception 'Aviso: informe a data do abastecimento.'; end if;
-  if trim(coalesce(p_pessoa,'')) = '' or trim(coalesce(p_veiculo,'')) = '' then
-    raise exception 'Aviso: informe a pessoa e o veículo.'; end if;
-  if p_valor is null or p_valor <= 0 then raise exception 'Aviso: informe um valor maior que zero.'; end if;
+/* ============ ações (cliques) ============ */
+const ACT = {
+  pessoa: d => { S.f = {...S.f, pessoa:d.n, sit:''}; S.tab = 'abs'; render(); scrollTo(0, 0); },
+  filtro: d => { S.f = {...S.f, sit:d.s}; S.tab = 'abs'; render(); scrollTo(0, 0); },
+  aba: d => { S.tab = d.t; render(); scrollTo(0, 0); },
+  sair: async () => { if (canal) { sb.removeChannel(canal); canal = null; } await sb.auth.signOut(); S.user = null; S.papel = ''; render(); },
+  atualizar: async () => { await carregar(); toast('Dados atualizados.'); },
+  novoab: () => formAb(), pagar: () => formPag(), ab: d => detAb(d.id), imprimir: () => print(),
+  testar: async () => { try { const {error} = await sb.rpc('testar_telegram'); if (error) throw error; toast('Mensagem de teste enviada. Confira no Telegram em alguns segundos.'); } catch (e) { toast(msg(e), 1); } },
+  estornar: async d => {
+    const p = S.pgs.find(x => x.id == d.id);
+    if (!await ask('Estornar pagamento?', `O pagamento de <b>${R(p.valor)}</b> de ${D(p.data)} será desfeito e os valores voltam a ficar pendentes. O registro continua no histórico.`, 'Sim, estornar')) return;
+    try { const {error} = await sb.rpc('estornar_pagamento', {p_id:p.id, p_motivo:null}); if (error) throw error; toast('Pagamento estornado.'); await carregar(); } catch (e) { toast(msg(e), 1); }
+  },
+  csvab: () => { const {de, ate} = S.r; baixar('abastecimentos', [['Nº','Data','Pessoa','Veículo','Placa','Valor','Pago','Falta pagar','Situação','Observações'], ...S.abs.filter(x => (!de || x.data >= de) && (!ate || x.data <= ate)).map(x => [x.numero, D(x.data), x.pessoa, x.veiculo, x.placa, dec(x.valor), dec(x.pago), dec(x.pendente), CHIP[x.situacao][1], x.observacoes])]); },
+  csvpg: () => { const {de, ate} = S.r; baixar('pagamentos', [['Data','Valor','Forma','Observação','Situação','Distribuição'], ...S.pgs.filter(x => (!de || x.data >= de) && (!ate || x.data <= ate)).map(p => [D(p.data), dec(p.valor), p.forma, p.observacao, p.estornado ? 'Estornado' : 'Válido', S.als.filter(a => a.pagamento_id == p.id).map(a => { const x = S.abs.find(y => y.id == a.abastecimento_id) || {}; return `nº ${x.numero} (${D(x.data)}): ${dec(a.valor)}`; }).join(' | ')])]); }
+};
+document.addEventListener('click', e => { const t = e.target.closest('[data-act]'); if (t && ACT[t.dataset.act]) ACT[t.dataset.act](t.dataset); });
+document.addEventListener('input', e => { const k = e.target.dataset.f; if (k) { S.f[k] = e.target.value; listaAbs(); } });
+document.addEventListener('change', e => { const k = e.target.dataset.f, r = e.target.dataset.r; if (k) { S.f[k] = e.target.value; listaAbs(); } if (r) { S.r[r] = e.target.value; render(); } });
 
-  insert into public.abastecimentos(data, pessoa, veiculo, placa, valor, observacoes)
-  values (p_data, trim(p_pessoa), trim(p_veiculo), nullif(upper(trim(coalesce(p_placa,''))),''),
-          round(p_valor,2), nullif(trim(coalesce(p_obs,'')),''))
-  returning id, numero into v_id, v_num;
-
-  perform public.enviar_telegram(
-    E'⛽ NOVO ABASTECIMENTO\n\nPessoa: ' || trim(p_pessoa) ||
-    E'\nVeículo: ' || trim(p_veiculo) ||
-    case when nullif(trim(coalesce(p_placa,'')),'') is not null then ' (' || upper(trim(p_placa)) || ')' else '' end ||
-    E'\nData: ' || to_char(p_data,'DD/MM/YYYY') ||
-    E'\nValor: ' || public.brl(round(p_valor,2)) ||
-    E'\nSituação: Pendente\n\nTotal pendente atualizado: ' || public.brl(public.saldo_pendente()) || '.');
-  return v_id;
-end $f$;
-
--- CORRIGIR ABASTECIMENTO (o histórico guarda o antes e o depois)
-create or replace function public.editar_abastecimento(
-  p_id uuid, p_data date, p_pessoa text, p_veiculo text, p_placa text, p_valor numeric, p_obs text)
-returns void language plpgsql security definer set search_path = public as $f$
-declare v_pago numeric; v_a public.abastecimentos;
-begin
-  if not public.eh_admin() then raise exception 'Aviso: você não tem permissão para editar.'; end if;
-  perform pg_advisory_xact_lock(7001);
-  select * into v_a from public.abastecimentos where id = p_id for update;
-  if not found then raise exception 'Aviso: abastecimento não encontrado.'; end if;
-  if v_a.cancelado then raise exception 'Aviso: este abastecimento está cancelado.'; end if;
-  if p_data is null or trim(coalesce(p_pessoa,'')) = '' or trim(coalesce(p_veiculo,'')) = '' then
-    raise exception 'Aviso: preencha data, pessoa e veículo.'; end if;
-  if p_valor is null or p_valor <= 0 then raise exception 'Aviso: informe um valor maior que zero.'; end if;
-  select coalesce(sum(al.valor),0) into v_pago
-    from public.alocacoes al join public.pagamentos pg on pg.id = al.pagamento_id
-   where al.abastecimento_id = p_id and not pg.estornado;
-  if round(p_valor,2) < v_pago then
-    raise exception 'Aviso: este abastecimento já recebeu % em pagamentos. O valor não pode ser menor que isso.', public.brl(v_pago);
-  end if;
-  update public.abastecimentos
-     set data = p_data, pessoa = trim(p_pessoa), veiculo = trim(p_veiculo),
-         placa = nullif(upper(trim(coalesce(p_placa,''))),''), valor = round(p_valor,2),
-         observacoes = nullif(trim(coalesce(p_obs,'')),'')
-   where id = p_id;
-  perform public.enviar_telegram(
-    E'✏️ ABASTECIMENTO CORRIGIDO\n\nAbastecimento nº ' || v_a.numero || ' (' || trim(p_pessoa) || E')\nValor: ' ||
-    public.brl(round(p_valor,2)) || E'\n\nSaldo pendente atualizado: ' || public.brl(public.saldo_pendente()) || '.');
-end $f$;
-
--- CANCELAR ABASTECIMENTO (o registro nunca é apagado; só se não houver pagamento ativo)
-create or replace function public.cancelar_abastecimento(p_id uuid) returns void
-language plpgsql security definer set search_path = public as $f$
-declare v_a public.abastecimentos;
-begin
-  if not public.eh_admin() then raise exception 'Aviso: você não tem permissão.'; end if;
-  perform pg_advisory_xact_lock(7001);
-  select * into v_a from public.abastecimentos where id = p_id for update;
-  if not found then raise exception 'Aviso: abastecimento não encontrado.'; end if;
-  if exists (select 1 from public.alocacoes al join public.pagamentos pg on pg.id = al.pagamento_id
-              where al.abastecimento_id = p_id and not pg.estornado) then
-    raise exception 'Aviso: este abastecimento já recebeu pagamento. Estorne o pagamento primeiro.';
-  end if;
-  update public.abastecimentos set cancelado = true where id = p_id;
-  perform public.enviar_telegram(
-    E'🚫 ABASTECIMENTO CANCELADO\n\nAbastecimento nº ' || v_a.numero || ' (' || v_a.pessoa || ', ' ||
-    public.brl(v_a.valor) || E')\n\nSaldo pendente atualizado: ' || public.brl(public.saldo_pendente()) || '.');
-end $f$;
-
--- REGISTRAR PAGAMENTO COM BAIXA AUTOMÁTICA (FIFO: do mais antigo para o mais novo)
-create or replace function public.registrar_pagamento(
-  p_chave uuid, p_data date, p_valor numeric, p_forma text, p_obs text)
-returns jsonb language plpgsql security definer set search_path = public as $f$
-declare
-  v_pg uuid; v_total numeric; v_rest numeric; v_aloc numeric; r record;
-  v_q int := 0; v_p int := 0; v_n int := 0; v_txt text := '';
-begin
-  if not public.eh_admin() then raise exception 'Aviso: você não tem permissão para registrar pagamentos.'; end if;
-  perform pg_advisory_xact_lock(7001);              -- um pagamento por vez
-
-  -- Já processado antes? (clique duplicado / falha de conexão) -> não baixa de novo
-  select id into v_pg from public.pagamentos where chave = p_chave;
-  if found then
-    return jsonb_build_object('pagamento_id', v_pg, 'repetido', true,
-                              'saldo_pendente', public.saldo_pendente());
-  end if;
-
-  if p_data is null then raise exception 'Aviso: informe a data do pagamento.'; end if;
-  if p_valor is null or round(p_valor,2) <= 0 then raise exception 'Aviso: informe um valor maior que zero.'; end if;
-  if p_forma not in ('Pix','Dinheiro','Transferência') then raise exception 'Aviso: forma de pagamento inválida.'; end if;
-
-  v_total := public.saldo_pendente();
-  if round(p_valor,2) > v_total then
-    raise exception 'Aviso: o pagamento (%) é maior que a dívida total (%). Informe no máximo %.',
-      public.brl(round(p_valor,2)), public.brl(v_total), public.brl(v_total);
-  end if;
-
-  insert into public.pagamentos(chave, data, valor, forma, observacao)
-  values (p_chave, p_data, round(p_valor,2), p_forma, nullif(trim(coalesce(p_obs,'')),''))
-  returning id into v_pg;
-
-  v_rest := round(p_valor,2);
-  for r in select id, numero, data, pessoa, pendente from public.v_abastecimentos
-            where not cancelado and pendente > 0
-            order by data, criado_em, id loop
-    exit when v_rest <= 0;
-    v_aloc := least(v_rest, r.pendente);
-    insert into public.alocacoes(pagamento_id, abastecimento_id, valor) values (v_pg, r.id, v_aloc);
-    v_rest := v_rest - v_aloc;
-    v_n := v_n + 1;
-    if v_aloc = r.pendente then
-      v_q := v_q + 1;
-      if v_n <= 10 then v_txt := v_txt || E'\n✅ ' || to_char(r.data,'DD/MM') || ' ' || r.pessoa || ': quitado'; end if;
-    else
-      v_p := v_p + 1;
-      if v_n <= 10 then v_txt := v_txt || E'\n⚠️ ' || to_char(r.data,'DD/MM') || ' ' || r.pessoa ||
-                          ': parcial, ainda falta ' || public.brl(r.pendente - v_aloc); end if;
-    end if;
-  end loop;
-
-  if v_rest <> 0 then raise exception 'Erro interno: sobrou valor sem distribuir. Operação desfeita.'; end if;
-
-  perform public.enviar_telegram(
-    E'💰 PAGAMENTO REGISTRADO\n\nValor recebido: ' || public.brl(round(p_valor,2)) ||
-    E'\nForma: ' || p_forma ||
-    E'\nAbastecimentos quitados: ' || v_q ||
-    E'\nAbastecimentos parcialmente pagos: ' || v_p || v_txt ||
-    E'\n\nSaldo pendente total: ' || public.brl(public.saldo_pendente()) || '.');
-
-  return jsonb_build_object('pagamento_id', v_pg, 'repetido', false, 'quitados', v_q,
-                            'parciais', v_p, 'saldo_pendente', public.saldo_pendente());
-end $f$;
-
--- ESTORNAR PAGAMENTO (os valores voltam a ficar pendentes; o registro continua no histórico)
-create or replace function public.estornar_pagamento(p_id uuid, p_motivo text default null)
-returns numeric language plpgsql security definer set search_path = public as $f$
-declare v_p public.pagamentos;
-begin
-  if not public.eh_admin() then raise exception 'Aviso: você não tem permissão.'; end if;
-  perform pg_advisory_xact_lock(7001);
-  select * into v_p from public.pagamentos where id = p_id for update;
-  if not found then raise exception 'Aviso: pagamento não encontrado.'; end if;
-  if v_p.estornado then raise exception 'Aviso: este pagamento já foi estornado.'; end if;
-  update public.pagamentos
-     set estornado = true, estornado_em = now(), motivo_estorno = nullif(trim(coalesce(p_motivo,'')),'')
-   where id = p_id;
-  perform public.enviar_telegram(
-    E'↩️ PAGAMENTO ESTORNADO\n\nValor estornado: ' || public.brl(v_p.valor) ||
-    E' (pagamento de ' || to_char(v_p.data,'DD/MM/YYYY') || E')\n\nSaldo pendente total: ' ||
-    public.brl(public.saldo_pendente()) || '.');
-  return public.saldo_pendente();
-end $f$;
-
--- Aviso de erro importante (o site chama quando um pagamento falha por motivo inesperado)
-create or replace function public.notificar_erro(p_msg text) returns void
-language plpgsql security definer set search_path = public as $f$
-begin
-  if not public.eh_admin() then return; end if;
-  perform public.enviar_telegram(E'🚨 ERRO NO PROCESSAMENTO DO PAGAMENTO\n\n' || left(coalesce(p_msg,'sem detalhes'), 300) ||
-    E'\n\nConfira a lista de Pagamentos antes de tentar de novo.');
-end $f$;
-
-create or replace function public.testar_telegram() returns void
-language plpgsql security definer set search_path = public as $f$
-begin
-  if not public.eh_admin() then raise exception 'Aviso: você não tem permissão.'; end if;
-  perform public.enviar_telegram('✅ Teste: o aviso do Telegram está funcionando.');
-end $f$;
-
--- 8) PERMISSÕES FINAIS (fecha tudo e libera só o necessário)
-revoke all on all tables in schema public from anon, authenticated;
-grant select on public.perfis, public.abastecimentos, public.pagamentos,
-                public.alocacoes, public.historico, public.v_abastecimentos to authenticated;
-
-revoke execute on all functions in schema public from public, anon, authenticated;
-grant execute on function public.papel_atual(), public.eh_autorizado(), public.eh_admin() to authenticated;
-grant execute on function
-  public.registrar_abastecimento(date,text,text,text,numeric,text),
-  public.editar_abastecimento(uuid,date,text,text,text,numeric,text),
-  public.cancelar_abastecimento(uuid),
-  public.registrar_pagamento(uuid,date,numeric,text,text),
-  public.estornar_pagamento(uuid,text),
-  public.notificar_erro(text),
-  public.testar_telegram()
-to authenticated;
-
--- =====================================================================
--- PASSOS MANUAIS DEPOIS DE RODAR ESTE ARQUIVO
---
--- A) Criar os usuários: Authentication > Users > Add user (e-mail + senha,
---    marque "Auto Confirm User"). O PRIMEIRO usuário criado vira admin.
---    Em Authentication > Sign In / Providers, DESLIGUE "Allow new users to sign up".
---
--- B) Liberar os demais (rode uma linha por pessoa, trocando o e-mail):
---    update public.perfis set papel = 'leitura'   -- só consulta (ex.: sua avó)
---     where user_id = (select id from auth.users where email = 'avo@email.com');
---    update public.perfis set papel = 'admin'     -- pode registrar
---     where user_id = (select id from auth.users where email = 'funcionario@email.com');
---
--- C) Telegram (rode numa consulta separada e NÃO salve essa consulta):
---    update public.app_config set valor = 'SEU_TOKEN_DO_BOTFATHER' where chave = 'telegram_token';
---    update public.app_config set valor = '111111111,222222222'     where chave = 'telegram_chat_ids';
---    (cada pessoa precisa abrir o bot e mandar /start antes de receber mensagens)
---    Se uma mensagem não chegar, veja o motivo com:
---    select status_code, content from net._http_response order by created desc limit 5;
---
--- D) Backup: Supabase > Database > Backups (diário nos planos pagos). No plano
---    gratuito, use os botões "Baixar planilha" do site toda semana.
--- =====================================================================
+/* ============ início ============ */
+(async () => {
+  if (!CFG.url.includes('COLE') && window.supabase) sb = supabase.createClient(CFG.url, CFG.key);
+  if (sb) { const {data:{session}} = await sb.auth.getSession(); if (session) await entrar(session.user); else render(); } else render();
+  document.addEventListener('visibilitychange', () => { if (!document.hidden && S.user && S.papel) carregar(); });
+})();
+</script>
+</body>
+</html>
