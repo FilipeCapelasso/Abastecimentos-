@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#0B4F6C"><meta name="color-scheme" content="light dark">
 <title>Controle de Abastecimentos</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;600;700&display=swap" rel="stylesheet">
@@ -18,7 +18,7 @@ header small{display:block}
 :focus-visible{outline:3px solid #F2A900;outline-offset:2px}
 .btn{min-height:56px;border:0;border-radius:14px;background:var(--brand);color:#fff;font-family:inherit;font-size:18px;font-weight:700;padding:0 22px;cursor:pointer}
 .btn:disabled{opacity:.5;cursor:not-allowed}
-.btn.sec{background:#fff;color:var(--brand);border:2px solid var(--brand)}
+.btn.sec{background:var(--card);color:var(--brand);border:2px solid var(--brand)}
 .btn.peq{min-height:44px;font-size:16px;padding:0 16px;margin-top:8px}
 .btn.lnk{min-height:44px;background:none;color:var(--brand);padding:0 8px;text-decoration:underline;font-size:16px}
 .hero{background:var(--brand);color:#fff;border-radius:22px;padding:22px}
@@ -31,21 +31,21 @@ header small{display:block}
 .card span{color:var(--mute);font-size:16px}.card b{display:block;font-size:24px}
 .chip{display:inline-block;padding:3px 10px;border-radius:99px;font-size:15px;font-weight:700;white-space:nowrap}
 .chip.ok{background:var(--okb);color:var(--ok)}.chip.wa{background:var(--wab);color:var(--wa)}.chip.pa{background:var(--pab);color:var(--pa)}.chip.cx{background:#E6E8EA;color:#444}
-table{width:100%;border-collapse:collapse;background:#fff;border-radius:14px;overflow:hidden}
+table{width:100%;border-collapse:collapse;background:var(--card);border-radius:14px;overflow:hidden}
 th,td{padding:12px;text-align:left;border-bottom:1px solid var(--line)}
 th{font-size:15px;color:var(--mute)}.r{text-align:right}
 tr[data-act]{cursor:pointer}tr[data-act]:hover{background:#F6F9FA}
-@media(max-width:700px){thead{display:none}table,tbody{display:block;background:none}tr{display:block;background:#fff;border:1px solid var(--line);border-radius:14px;margin-bottom:10px;padding:6px 0}td{display:flex;justify-content:space-between;gap:12px;border:0;padding:6px 14px;text-align:right}td::before{content:attr(data-label);color:var(--mute);text-align:left}}
+@media(max-width:700px){thead{display:none}table,tbody{display:block;background:none}tr{display:block;background:var(--card);border:1px solid var(--line);border-radius:14px;margin-bottom:10px;padding:6px 0}td{display:flex;justify-content:space-between;gap:12px;border:0;padding:6px 14px;text-align:right}td::before{content:attr(data-label);color:var(--mute);text-align:left}}
 .filtros{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
 .filtros .full{grid-column:1/-1}
 @media(min-width:760px){.filtros{grid-template-columns:repeat(4,1fr)}.filtros .full{grid-column:span 2}}
 label{display:block;margin:12px 0 4px;font-weight:700;font-size:16px}.filtros label{margin:0 0 4px}
-input,select,textarea{width:100%;min-height:52px;font:inherit;border:2px solid var(--line);border-radius:12px;padding:10px 12px;background:#fff;color:var(--ink)}
-nav{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid var(--line);display:flex;padding-bottom:env(safe-area-inset-bottom);z-index:5}
+input,select,textarea{width:100%;min-height:52px;font:inherit;border:2px solid var(--line);border-radius:12px;padding:10px 12px;background:var(--card);color:var(--ink)}
+nav{position:fixed;left:0;right:0;bottom:0;background:var(--card);border-top:1px solid var(--line);display:flex;padding-bottom:env(safe-area-inset-bottom);z-index:5}
 nav button{flex:1;min-height:64px;border:0;background:none;font-family:inherit;font-size:15px;color:var(--mute);cursor:pointer}
 nav button.on{color:var(--brand);font-weight:700;box-shadow:inset 0 3px var(--brand)}
 .ov{position:fixed;inset:0;background:rgba(16,34,43,.55);display:flex;align-items:flex-end;justify-content:center;z-index:20;overflow:auto}
-.box{background:#fff;width:100%;max-width:560px;border-radius:22px 22px 0 0;padding:22px;max-height:94vh;overflow:auto}
+.box{background:var(--card);width:100%;max-width:560px;border-radius:22px 22px 0 0;padding:22px;max-height:94vh;overflow:auto}
 @media(min-width:700px){.ov{align-items:center}.box{border-radius:22px}}
 .box h2{margin-top:0}.btns{display:flex;gap:12px;margin-top:18px}.btns .btn{flex:1}
 ul{padding-left:20px;margin:8px 0}#prev ul{max-height:28vh;overflow:auto}
@@ -59,7 +59,12 @@ html{scroll-behavior:smooth}
 @media(max-width:700px){tr[data-s=pago]{border-left:5px solid var(--ok)}tr[data-s=parcial]{border-left:5px solid var(--pa)}tr[data-s=pendente]{border-left:5px solid #E0A030}}
 .atalhos{display:flex;gap:10px;flex-wrap:wrap;margin:6px 0 4px}.atalhos .btn{min-height:48px;font-size:15px;flex:1;padding:0 12px}
 @media(min-width:900px){nav{top:0;bottom:auto;border-top:0;border-bottom:1px solid var(--line);justify-content:center}nav button{flex:0 0 200px;min-height:60px;font-size:16px;box-shadow:none}nav button.on{box-shadow:inset 0 -3px var(--brand)}.wrap{padding:84px 16px 40px}}
-@media print{nav,.noprint,.btn{display:none!important}body{background:#fff}.wrap{padding:0}}
+@media print{nav,.noprint,.btn{display:none!important}body,table,tr,.card{background:var(--card)!important;color:#000!important}.wrap{padding:0}}
+
+@media(prefers-color-scheme:dark){:root{--bg:#0E1A20;--card:#16262E;--ink:#E8F0F3;--mute:#9DB0B9;--brand:#4FB3D9;--line:#2A3E48;--ok:#5FD39A;--okb:#12362A;--wa:#F0B45A;--wab:#3A2C10;--pa:#7DB6F2;--pab:#14304D;--er:#FF8A80}.btn{color:#06222E}.hero{background:#0B4F6C;color:#fff}.chip.cx{background:#2A3338;color:#ccc}tr[data-act]:hover{background:#1B2F38}.ov{background:rgba(0,0,0,.65)}.toast{background:#E8F0F3;color:#10222B}}
+@keyframes up{from{transform:translateY(24px);opacity:0}}.box,.toast{animation:up .22s ease}.btn:active{transform:scale(.98)}.card[data-act]{cursor:pointer;transition:box-shadow .15s}.card[data-act]:hover{box-shadow:0 4px 14px rgba(0,0,0,.15)}
+.graf{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;height:150px;margin-bottom:8px}.graf>div{display:flex;flex-direction:column;text-align:center;min-width:0}.cols{flex:1;display:flex;align-items:flex-end;justify-content:center;gap:4px}.cols i{width:40%;max-width:26px;min-height:2px;border-radius:6px 6px 0 0}.ga{background:var(--brand)}.gp{background:var(--ok)}.dot{display:inline-block;width:10px;height:10px;border-radius:3px;vertical-align:middle}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
 <body>
@@ -86,6 +91,8 @@ function num(s) { // aceita 1.500,00 / 1500,50 / 1500.5 / 1500
   else if (!/^\d+\.\d{1,2}$/.test(s)) s = s.replace(/\./g, '');
   return Number(s);
 }
+const dias = d => Math.max(0, Math.round((new Date(hoje()) - new Date(d)) / 864e5));
+const idade = x => x.cancelado || x.situacao == 'pago' || !dias(x.data) ? '' : `<br><small>há ${dias(x.data)} dia${dias(x.data) > 1 ? 's' : ''}</small>`;
 const CHIP = {pago:['ok','Pago'], parcial:['pa','Parcialmente pago'], pendente:['wa','Pendente'], cancelado:['cx','Removido']};
 const chip = s => `<span class="chip ${CHIP[s][0]}">${CHIP[s][1]}</span>`;
 
@@ -122,7 +129,14 @@ async function entrar(u) {
   S.user = u;
   const {data} = await sb.from('perfis').select('*').eq('user_id', u.id).maybeSingle();
   S.papel = data?.papel || ''; S.nome = data?.nome || u.email;
-  if (['admin','leitura'].includes(S.papel)) await carregar(); else render();
+  if (['admin','leitura'].includes(S.papel)) { await carregar(); aoVivo(); } else render();
+}
+
+let canal;
+function aoVivo() { // atualiza sozinho quando algo é registrado (inclusive pelo Telegram)
+  if (canal || !sb) return; let t;
+  const f = () => { clearTimeout(t); t = setTimeout(() => { if (S.user && !document.querySelector('.ov')) carregar(); }, 800); };
+  canal = sb.channel('ao-vivo'); ['abastecimentos','pagamentos','alocacoes'].forEach(tb => canal.on('postgres_changes', {event:'*', schema:'public', table:tb}, f)); canal.subscribe();
 }
 
 /* ============ telas ============ */
@@ -154,18 +168,31 @@ function inicio() {
   const a = ativos(), tot = sum(a,'valor'), pago = sum(a,'pago'), pend = sum(a,'pendente');
   const parc = a.filter(x => x.situacao == 'parcial').length, ult = S.pgs.find(p => !p.estornado);
   const ant = fifo().slice(0, 5), cred = credito(), nS = k => a.filter(x => x.situacao == k).length;
-  return `<div class="hero"><div>Falta pagar</div><div class="n">${R(pend)}</div><div class="bar"><i style="width:${tot ? Math.min(100, pago/tot*100) : 0}%"></i></div><div style="margin-top:8px">${R(pago)} pagos de ${R(tot)}</div></div>
+  return `<div class="hero"><div>Falta pagar</div><div class="n">${R(pend)}</div><div class="bar"><i style="width:${tot ? Math.min(100, pago/tot*100) : 0}%"></i></div><div style="margin-top:8px">${R(pago)} pagos de ${R(tot)} (${tot ? Math.round(pago/tot*100) : 0}%)${ant[0] ? ` · mais antiga há ${dias(ant[0].data)} dia(s)` : ''}</div></div>
   ${adm() ? `<div class="acoes"><button class="btn" data-act="novoab">Novo abastecimento</button><button class="btn sec" data-act="pagar">Registrar pagamento</button></div>` : ''}
   <div class="grid"><div class="card"><span>Total abastecido</span><b>${R(tot)}</b></div><div class="card ok"><span>Total pago</span><b>${R(pago)}</b></div><div class="card wa"><span>Saldo pendente</span><b>${R(pend)}</b></div>
   <div class="card"><span>Abastecimentos</span><b>${a.length}</b></div><div class="card pa"><span>Parcialmente pagos</span><b>${parc}</b></div>
   <div class="card"><span>Último pagamento</span><b>${ult ? R(ult.valor) : '-'}</b>${ult ? `<small>em ${D(ult.data)}</small>` : ''}</div>${cred > 0 ? `<div class="card ok"><span>Crédito guardado</span><b>${R(cred)}</b><small>abate as próximas dívidas</small></div>` : ''}</div>
   <div class="atalhos noprint"><button class="btn sec" data-act="filtro" data-s="pendente">Pendentes (${nS('pendente')})</button><button class="btn sec" data-act="filtro" data-s="parcial">Parciais (${nS('parcial')})</button><button class="btn sec" data-act="filtro" data-s="pago">Pagos (${nS('pago')})</button></div>
-  <h2>Dívidas mais antigas</h2>${ant.length ? tabela(ant) : '<p class="vazio">Nada pendente. Tudo pago.</p>'}
-  ${adm() ? '<p class="noprint"><button class="btn lnk" data-act="testar">Testar aviso do Telegram</button></p>' : ''}`;
+  ${grafico()}${devedores()}<h2>Dívidas mais antigas</h2>${ant.length ? tabela(ant) : '<p class="vazio">Nada pendente. Tudo pago.</p>'}
+  ${adm() ? '<p class="noprint"><button class="btn lnk" data-act="testar">Testar aviso do Telegram</button><br><small>No Telegram: /abastecimento, /pagamento, /status, /pendentes e /ultimos.</small></p>' : ''}`;
+}
+
+function grafico() {
+  const d0 = new Date(hoje() + 'T00:00'), ms = [];
+  for (let i = 5; i >= 0; i--) { const d = new Date(d0.getFullYear(), d0.getMonth() - i, 1); ms.push(d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0')); }
+  const v = ms.map(m => [sum(ativos().filter(x => x.data.startsWith(m)), 'valor'), sum(S.pgs.filter(p => !p.estornado && p.data.startsWith(m)), 'valor')]);
+  const mx = Math.max(1, ...v.flat()), nome = m => new Date(m + '-15T00:00').toLocaleDateString('pt-BR', {month:'short'}).replace('.', '');
+  return `<h2>Últimos 6 meses</h2><div class="card"><div class="graf">${ms.map((m, i) => `<div><div class="cols"><i class="ga" style="height:${v[i][0]/mx*100}%" title="Abastecido: ${R(v[i][0])}"></i><i class="gp" style="height:${v[i][1]/mx*100}%" title="Pago: ${R(v[i][1])}"></i></div><small>${nome(m)}</small></div>`).join('')}</div><small><span class="dot ga"></span> Abastecido &nbsp; <span class="dot gp"></span> Pago &nbsp; (passe o mouse ou toque nas barras para ver o valor)</small></div>`;
+}
+function devedores() {
+  const m = {}; ativos().forEach(x => { if (cents(x.pendente) > 0) m[x.pessoa] = (m[x.pessoa] || 0) + cents(x.pendente); });
+  const l = Object.entries(m).sort((a, b) => b[1] - a[1]).slice(0, 3);
+  return l.length ? `<h2>Maiores saldos pendentes</h2><div class="grid">${l.map(([n, c]) => `<div class="card wa" data-act="pessoa" data-n="${esc(n)}"><span>${esc(n)}</span><b>${R(c / 100)}</b></div>`).join('')}</div>` : '';
 }
 
 function tabela(l) {
-  return `<table><thead><tr><th>Data<th>Pessoa<th>Veículo<th class="r">Valor original<th class="r">Valor pago<th class="r">Falta pagar<th>Situação</thead><tbody>${l.map(x => `<tr data-act="ab" data-id="${x.id}" data-s="${x.situacao}"><td data-label="Data">${D(x.data)}<td data-label="Pessoa">${esc(x.pessoa)}<td data-label="Veículo">${esc(x.veiculo)}${x.placa ? ' <small>' + esc(x.placa) + '</small>' : ''}<td data-label="Valor original" class="r">${R(x.valor)}<td data-label="Valor pago" class="r">${R(x.pago)}<td data-label="Falta pagar" class="r"><b>${R(x.pendente)}</b><td data-label="Situação">${chip(x.situacao)}`).join('')}</tbody></table>`;
+  return `<table><thead><tr><th>Data<th>Pessoa<th>Veículo<th class="r">Valor original<th class="r">Valor pago<th class="r">Falta pagar<th>Situação</thead><tbody>${l.map(x => `<tr data-act="ab" data-id="${x.id}" data-s="${x.situacao}"><td data-label="Data">${D(x.data)}${idade(x)}<td data-label="Pessoa">${esc(x.pessoa)}<td data-label="Veículo">${esc(x.veiculo)}${x.placa ? ' <small>' + esc(x.placa) + '</small>' : ''}<td data-label="Valor original" class="r">${R(x.valor)}<td data-label="Valor pago" class="r">${R(x.pago)}<td data-label="Falta pagar" class="r"><b>${R(x.pendente)}</b><td data-label="Situação">${chip(x.situacao)}`).join('')}</tbody></table>`;
 }
 
 const uniq = k => [...new Set(S.abs.map(x => x[k]).filter(Boolean))].sort((a,b) => a.localeCompare(b,'pt-BR'));
@@ -198,7 +225,7 @@ function pgsTab() {
 function relTab() {
   const {de, ate} = S.r, inP = d => (!de || d >= de) && (!ate || d <= ate);
   const a = ativos().filter(x => inP(x.data)), p = S.pgs.filter(x => !x.estornado && inP(x.data));
-  const grp = k => { const m = {}; a.forEach(x => { const g = m[x[k]] ||= {n:0, v:[], }; g.n++; g.v.push(x); }); return Object.entries(m).sort((x,y) => sum(y[1].v,'valor') - sum(x[1].v,'valor')).map(([n,g]) => `<tr><td data-label="Nome">${esc(n)}<td data-label="Quantidade" class="r">${g.n}<td data-label="Total abastecido" class="r">${R(sum(g.v,'valor'))}<td data-label="Falta pagar" class="r">${R(sum(g.v,'pendente'))}`).join(''); };
+  const grp = k => { const m = {}; a.forEach(x => { const g = m[x[k]] ||= {n:0, v:[], }; g.n++; g.v.push(x); }); return Object.entries(m).sort((x,y) => sum(y[1].v,'valor') - sum(x[1].v,'valor')).map(([n,g]) => `<tr ${k == 'pessoa' ? `data-act="pessoa" data-n="${esc(n)}"` : ''}><td data-label="Nome">${esc(n)}<td data-label="Quantidade" class="r">${g.n}<td data-label="Total abastecido" class="r">${R(sum(g.v,'valor'))}<td data-label="Falta pagar" class="r">${R(sum(g.v,'pendente'))}`).join(''); };
   const tb = k => `<table><thead><tr><th>Nome<th class="r">Quantidade<th class="r">Total abastecido<th class="r">Falta pagar</thead><tbody>${grp(k) || '<tr><td>Nada no período'}</tbody></table>`;
   const nq = fifo();
   return `<h2>Relatórios</h2><div class="filtros noprint"><label>Período: de<input type="date" data-r="de" value="${de}"></label><label>até<input type="date" data-r="ate" value="${ate}"></label></div>
@@ -304,9 +331,10 @@ const dec = n => Number(n).toFixed(2).replace('.', ',');
 
 /* ============ ações (cliques) ============ */
 const ACT = {
+  pessoa: d => { S.f = {...S.f, pessoa:d.n, sit:''}; S.tab = 'abs'; render(); scrollTo(0, 0); },
   filtro: d => { S.f = {...S.f, sit:d.s}; S.tab = 'abs'; render(); scrollTo(0, 0); },
   aba: d => { S.tab = d.t; render(); scrollTo(0, 0); },
-  sair: async () => { await sb.auth.signOut(); S.user = null; S.papel = ''; render(); },
+  sair: async () => { if (canal) { sb.removeChannel(canal); canal = null; } await sb.auth.signOut(); S.user = null; S.papel = ''; render(); },
   atualizar: async () => { await carregar(); toast('Dados atualizados.'); },
   novoab: () => formAb(), pagar: () => formPag(), ab: d => detAb(d.id), imprimir: () => print(),
   testar: async () => { try { const {error} = await sb.rpc('testar_telegram'); if (error) throw error; toast('Mensagem de teste enviada. Confira no Telegram em alguns segundos.'); } catch (e) { toast(msg(e), 1); } },
