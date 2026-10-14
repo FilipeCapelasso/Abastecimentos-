@@ -192,14 +192,14 @@ function devedores() {
 }
 
 function tabela(l) {
-  return `<table><thead><tr><th>Data<th>Pessoa<th>Veículo<th class="r">Valor original<th class="r">Valor pago<th class="r">Falta pagar<th>Situação</thead><tbody>${l.map(x => `<tr data-act="ab" data-id="${x.id}" data-s="${x.situacao}"><td data-label="Data">${D(x.data)}${idade(x)}<td data-label="Pessoa">${esc(x.pessoa)}<td data-label="Veículo">${esc(x.veiculo)}${x.placa ? ' <small>' + esc(x.placa) + '</small>' : ''}<td data-label="Valor original" class="r">${R(x.valor)}<td data-label="Valor pago" class="r">${R(x.pago)}<td data-label="Falta pagar" class="r"><b>${R(x.pendente)}</b><td data-label="Situação">${chip(x.situacao)}`).join('')}</tbody></table>`;
+  return `<table><thead><tr><th>Data<th>Pessoa<th>Veículo<th class="r">Valor original<th class="r">Valor pago<th class="r">Falta pagar<th>Situação</thead><tbody>${l.map(x => `<tr data-act="ab" data-id="${x.id}" data-s="${x.situacao}"><td data-label="Data">${D(x.data)}${idade(x)}<td data-label="Pessoa">${esc(x.pessoa)}<td data-label="Veículo">${esc(x.veiculo)}<td data-label="Valor original" class="r">${R(x.valor)}<td data-label="Valor pago" class="r">${R(x.pago)}<td data-label="Falta pagar" class="r"><b>${R(x.pendente)}</b><td data-label="Situação">${chip(x.situacao)}`).join('')}</tbody></table>`;
 }
 
 const uniq = k => [...new Set(S.abs.map(x => x[k]).filter(Boolean))].sort((a,b) => a.localeCompare(b,'pt-BR'));
 function absTab() {
   const f = S.f, op = (l, v) => `<option value="">Todos</option>` + l.map(x => `<option ${x==v?'selected':''}>${esc(x)}</option>`).join('');
   return `<h2>Abastecimentos</h2><div class="filtros noprint">
-  <div class="full"><label>Buscar por nome, placa ou número<input data-f="q" value="${esc(f.q)}" placeholder="Digite aqui"></label></div>
+  <div class="full"><label>Buscar por nome, veículo ou número<input data-f="q" value="${esc(f.q)}" placeholder="Digite aqui"></label></div>
   <label>De<input type="date" data-f="de" value="${f.de}"></label><label>Até<input type="date" data-f="ate" value="${f.ate}"></label>
   <label>Pessoa<select data-f="pessoa">${op(uniq('pessoa'), f.pessoa)}</select></label><label>Veículo<select data-f="veiculo">${op(uniq('veiculo'), f.veiculo)}</select></label>
   <label>Situação<select data-f="sit">${['','pendente','parcial','pago','cancelado'].map(s => `<option value="${s}" ${f.sit==s?'selected':''}>${s ? CHIP[s][1] : 'Todas'}</option>`).join('')}</select></label>
@@ -208,7 +208,7 @@ function absTab() {
 }
 function listaAbs() {
   const f = S.f, q = f.q.trim().toLowerCase();
-  const l = S.abs.filter(x => (f.sit == 'cancelado' ? x.cancelado : !x.cancelado) && (!f.de || x.data >= f.de) && (!f.ate || x.data <= f.ate) && (!f.pessoa || x.pessoa == f.pessoa) && (!f.veiculo || x.veiculo == f.veiculo) && (!f.sit || f.sit == 'cancelado' || x.situacao == f.sit) && (!q || [x.pessoa, x.veiculo, x.placa, x.numero].join(' ').toLowerCase().includes(q)))
+  const l = S.abs.filter(x => (f.sit == 'cancelado' ? x.cancelado : !x.cancelado) && (!f.de || x.data >= f.de) && (!f.ate || x.data <= f.ate) && (!f.pessoa || x.pessoa == f.pessoa) && (!f.veiculo || x.veiculo == f.veiculo) && (!f.sit || f.sit == 'cancelado' || x.situacao == f.sit) && (!q || [x.pessoa, x.veiculo, x.numero].join(' ').toLowerCase().includes(q)))
     .sort((a,b) => (a.data < b.data ? -1 : a.data > b.data ? 1 : 0) * (f.ord == 'asc' ? 1 : -1));
   $('#lista').innerHTML = l.length ? tabela(l) + `<p class="mute">${l.length} abastecimento(s). Falta pagar neste filtro: <b>${R(sum(l.filter(x => !x.cancelado),'pendente'))}</b></p>` : '<p class="vazio">Nenhum abastecimento encontrado.</p>';
 }
@@ -217,7 +217,7 @@ function pgsTab() {
   return `<h2>Pagamentos</h2>${adm() ? '<div class="acoes"><button class="btn sec" data-act="pagar">Registrar pagamento</button></div>' : ''}` + (S.pgs.length ? S.pgs.map(p => {
     const als = S.als.filter(a => a.pagamento_id == p.id);
     return `<details class="card"><summary><b class="${p.estornado ? 'riscado' : ''}">${R(p.valor)}</b> em ${D(p.data)}, ${esc(p.forma)} ${p.estornado ? '<span class="chip wa">Estornado</span>' : ''}</summary>
-    ${p.observacao ? `<p>${esc(p.observacao)}</p>` : ''}<p class="mute">Como o dinheiro foi distribuído:</p><ul>${als.map(a => { const x = S.abs.find(y => y.id == a.abastecimento_id) || {}; return `<li>${R(a.valor)} para o abastecimento nº ${x.numero} de ${D(x.data)} (${esc(x.pessoa)})${x.cancelado ? ' - removido' : ''}</li>`; }).join('')}</ul>
+    <p class="mute">Como o dinheiro foi distribuído:</p><ul>${als.map(a => { const x = S.abs.find(y => y.id == a.abastecimento_id) || {}; return `<li>${R(a.valor)} para o abastecimento nº ${x.numero} de ${D(x.data)} (${esc(x.pessoa)})${x.cancelado ? ' - removido' : ''}</li>`; }).join('')}</ul>
     <p>Total distribuído: <b>${R(sum(als,'valor'))}</b></p>${adm() && !p.estornado ? `<button class="btn sec peq" data-act="estornar" data-id="${p.id}">Estornar pagamento</button>` : ''}</details>`;
   }).join('') : '<p class="vazio">Nenhum pagamento registrado ainda.</p>');
 }
@@ -232,7 +232,7 @@ function relTab() {
   <div class="grid"><div class="card"><span>Abastecido no período</span><b>${R(sum(a,'valor'))}</b></div><div class="card"><span>Pago no período</span><b>${R(sum(p,'valor'))}</b></div><div class="card"><span>Falta pagar agora (total)</span><b>${R(sum(ativos(),'pendente'))}</b></div></div>
   <div class="acoes noprint"><button class="btn sec" data-act="csvab">Baixar abastecimentos (planilha)</button><button class="btn sec" data-act="csvpg">Baixar pagamentos (planilha)</button><button class="btn sec" data-act="imprimir">Imprimir relatório</button></div>
   <h2>Por pessoa</h2>${tb('pessoa')}<h2>Por veículo</h2>${tb('veiculo')}
-  <h2>Pagamentos do período</h2>${p.length ? `<table><thead><tr><th>Data<th class="r">Valor<th>Forma<th>Observação</thead><tbody>${p.map(x => `<tr><td data-label="Data">${D(x.data)}<td data-label="Valor" class="r">${R(x.valor)}<td data-label="Forma">${esc(x.forma)}<td data-label="Observação">${esc(x.observacao || '-')}`).join('')}</tbody></table>` : '<p class="vazio">Nenhum pagamento no período.</p>'}
+  <h2>Pagamentos do período</h2>${p.length ? `<table><thead><tr><th>Data<th class="r">Valor<th>Forma</thead><tbody>${p.map(x => `<tr><td data-label="Data">${D(x.data)}<td data-label="Valor" class="r">${R(x.valor)}<td data-label="Forma">${esc(x.forma)}`).join('')}</tbody></table>` : '<p class="vazio">Nenhum pagamento no período.</p>'}
   <h2>Dívidas ainda não quitadas (mais antigas primeiro)</h2>${nq.length ? tabela(nq) : '<p class="vazio">Nada pendente.</p>'}`;
 }
 
@@ -242,10 +242,8 @@ function formAb(a) {
   const o = modal(`<h2>${a ? 'Corrigir abastecimento' : 'Novo abastecimento'}</h2>
   <label>Pessoa que abasteceu<input id="fp" list="lp" value="${esc(a?.pessoa)}" autocomplete="off"></label>${dl('lp','pessoa')}
   <label>Veículo<input id="fv" list="lv" value="${esc(a?.veiculo)}" placeholder="Ex.: Caminhão 01" autocomplete="off"></label>${dl('lv','veiculo')}
-  <label>Placa (se tiver)<input id="fl" value="${esc(a?.placa)}" autocapitalize="characters"></label>
   <label>Data do abastecimento<input id="fd" type="date" value="${a?.data || hoje()}"></label>
   <label>Valor total<input id="fr" inputmode="decimal" placeholder="0,00" value="${a ? String(a.valor).replace('.', ',') : ''}"></label>
-  <label>Observações (opcional)<textarea id="fo" rows="2">${esc(a?.observacoes)}</textarea></label>
   <div class="btns"><button class="btn sec" id="cx">Cancelar</button><button class="btn" id="ok">Salvar</button></div>`);
   $('#cx').onclick = () => o.close();
   $('#ok').onclick = e => {
@@ -253,7 +251,7 @@ function formAb(a) {
     if (!p || !ve) return toast('Preencha a pessoa e o veículo.', 1);
     if (!$('#fd').value) return toast('Informe a data.', 1);
     if (!(v > 0)) return toast('Informe um valor maior que zero.', 1);
-    const args = {p_data:$('#fd').value, p_pessoa:p, p_veiculo:ve, p_placa:$('#fl').value.trim(), p_valor:v, p_obs:$('#fo').value.trim()};
+    const args = {p_data:$('#fd').value, p_pessoa:p, p_veiculo:ve, p_placa:'', p_valor:v, p_obs:''};
     run(e.target, async () => {
       const {error} = a ? await sb.rpc('editar_abastecimento', {p_id:a.id, ...args}) : await sb.rpc('registrar_abastecimento', args);
       if (error) throw error;
@@ -270,7 +268,7 @@ function formPag() {
   <label>Valor do pagamento<input id="pv" inputmode="decimal" placeholder="0,00"></label><button class="btn sec peq" id="tudo">Pagar tudo (${R(pend)})</button>
   <label>Data do pagamento<input id="pd" type="date" value="${hoje()}"></label>
   <label>Forma de pagamento<select id="pf"><option>Pix<option>Dinheiro<option>Transferência</select></label>
-  <label>Observação (opcional)<textarea id="po" rows="2"></textarea></label><div id="prev"></div>
+  <div id="prev"></div>
   <div class="btns"><button class="btn sec" id="cx">Cancelar</button><button class="btn" id="ok" disabled>Registrar pagamento</button></div>`);
   const prev = () => {
     const v = num($('#pv').value), c = cents(v), tot = cents(pend); let h = '', ok = false;
@@ -289,7 +287,7 @@ function formPag() {
     const v = num($('#pv').value), f = $('#pf').value;
     if (!await ask('Confirmar pagamento?', `Você vai registrar <b>${R(v)}</b> (${esc(f)}) em ${D($('#pd').value)}. Ele será distribuído automaticamente, do abastecimento mais antigo para o mais novo.`, 'Sim, registrar')) return;
     run(e.target, async () => {
-      const {data, error} = await sb.rpc('registrar_pagamento', {p_chave:chave, p_data:$('#pd').value, p_valor:v, p_forma:f, p_obs:$('#po').value.trim()});
+      const {data, error} = await sb.rpc('registrar_pagamento', {p_chave:chave, p_data:$('#pd').value, p_valor:v, p_forma:f, p_obs:''});
       if (error) {
         if (!String(error.message).startsWith('Aviso:')) await sb.rpc('notificar_erro', {p_msg: error.message}).catch(() => {});
         throw new Error(String(error.message).replace(/^Aviso:\s*/, '') + (String(error.message).startsWith('Aviso:') ? '' : ' Confira a lista de pagamentos antes de tentar de novo.'));
@@ -303,8 +301,8 @@ async function detAb(id) {
   const a = S.abs.find(x => x.id == id); if (!a) return;
   const als = S.als.filter(x => x.abastecimento_id == id).map(x => ({...x, p:S.pgs.find(p => p.id == x.pagamento_id)})).filter(x => x.p && !x.p.estornado);
   const o = modal(`<h2>Abastecimento nº ${a.numero}</h2><p>${chip(a.situacao)}</p>
-  <p><b>${esc(a.pessoa)}</b>, ${esc(a.veiculo)}${a.placa ? ' (' + esc(a.placa) + ')' : ''}<br>Data: ${D(a.data)}</p>
-  <p>Valor original: <b>${R(a.valor)}</b><br>Valor pago: <b>${R(a.pago)}</b><br>Falta pagar: <b>${R(a.pendente)}</b></p>${a.observacoes ? `<p>${esc(a.observacoes)}</p>` : ''}
+  <p><b>${esc(a.pessoa)}</b>, ${esc(a.veiculo)}<br>Data: ${D(a.data)}</p>
+  <p>Valor original: <b>${R(a.valor)}</b><br>Valor pago: <b>${R(a.pago)}</b><br>Falta pagar: <b>${R(a.pendente)}</b></p>
   <p class="mute">Pagamentos recebidos:</p>${als.length ? `<ul>${als.map(x => `<li>${R(x.valor)} do pagamento de ${D(x.p.data)}</li>`).join('')}</ul>` : '<p>Nenhum ainda.</p>'}
   <p class="mute">Alterações:</p><div id="hist">Carregando...</div>
   <div class="btns">${adm() && !a.cancelado ? '<button class="btn sec" id="ed">Corrigir</button><button class="btn sec" id="cn">Remover abastecimento</button>' : ''}<button class="btn" id="fc">Fechar</button></div>`);
@@ -313,7 +311,7 @@ async function detAb(id) {
     $('#cn').onclick = async () => { if (!await ask('Remover abastecimento?', `O abastecimento nº ${a.numero} (${R(a.valor)}) deixa de contar nos totais e sai da lista, mas fica guardado no histórico.${cents(a.pago) > 0 ? ` Ele já recebeu <b>${R(a.pago)}</b>: esse dinheiro não se perde. Ele passa para as próximas dívidas mais antigas (ou fica guardado como crédito).` : ''}`, 'Sim, remover')) return;
       try { const {error} = await sb.rpc('cancelar_abastecimento', {p_id:a.id}); if (error) throw error; o.close(); toast('Abastecimento removido.'); await carregar(); } catch (e) { toast(msg(e), 1); } }; }
   const {data} = await sb.from('historico').select('*').eq('registro_id', id).order('id');
-  const L = {data:'Data', pessoa:'Pessoa', veiculo:'Veículo', placa:'Placa', valor:'Valor', observacoes:'Observações', cancelado:'Removido'};
+  const L = {data:'Data', pessoa:'Pessoa', veiculo:'Veículo', valor:'Valor', cancelado:'Removido'};
   const fv = (k, v) => k == 'valor' ? R(v) : k == 'data' ? D(v) : k == 'cancelado' ? (v ? 'sim' : 'não') : (v || '-');
   const h = (data || []).map(x => { const dt = new Date(x.criado_em).toLocaleDateString('pt-BR');
     if (x.acao == 'INSERT') return `<li>${dt}: registrado</li>`;
@@ -343,8 +341,8 @@ const ACT = {
     if (!await ask('Estornar pagamento?', `O pagamento de <b>${R(p.valor)}</b> de ${D(p.data)} será desfeito e os valores voltam a ficar pendentes. O registro continua no histórico.`, 'Sim, estornar')) return;
     try { const {error} = await sb.rpc('estornar_pagamento', {p_id:p.id, p_motivo:null}); if (error) throw error; toast('Pagamento estornado.'); await carregar(); } catch (e) { toast(msg(e), 1); }
   },
-  csvab: () => { const {de, ate} = S.r; baixar('abastecimentos', [['Nº','Data','Pessoa','Veículo','Placa','Valor','Pago','Falta pagar','Situação','Observações'], ...S.abs.filter(x => (!de || x.data >= de) && (!ate || x.data <= ate)).map(x => [x.numero, D(x.data), x.pessoa, x.veiculo, x.placa, dec(x.valor), dec(x.pago), dec(x.pendente), CHIP[x.situacao][1], x.observacoes])]); },
-  csvpg: () => { const {de, ate} = S.r; baixar('pagamentos', [['Data','Valor','Forma','Observação','Situação','Distribuição'], ...S.pgs.filter(x => (!de || x.data >= de) && (!ate || x.data <= ate)).map(p => [D(p.data), dec(p.valor), p.forma, p.observacao, p.estornado ? 'Estornado' : 'Válido', S.als.filter(a => a.pagamento_id == p.id).map(a => { const x = S.abs.find(y => y.id == a.abastecimento_id) || {}; return `nº ${x.numero} (${D(x.data)}): ${dec(a.valor)}`; }).join(' | ')])]); }
+  csvab: () => { const {de, ate} = S.r; baixar('abastecimentos', [['Nº','Data','Pessoa','Veículo','Valor','Pago','Falta pagar','Situação'], ...S.abs.filter(x => (!de || x.data >= de) && (!ate || x.data <= ate)).map(x => [x.numero, D(x.data), x.pessoa, x.veiculo, dec(x.valor), dec(x.pago), dec(x.pendente), CHIP[x.situacao][1]])]); },
+  csvpg: () => { const {de, ate} = S.r; baixar('pagamentos', [['Data','Valor','Forma','Situação','Distribuição'], ...S.pgs.filter(x => (!de || x.data >= de) && (!ate || x.data <= ate)).map(p => [D(p.data), dec(p.valor), p.forma, p.estornado ? 'Estornado' : 'Válido', S.als.filter(a => a.pagamento_id == p.id).map(a => { const x = S.abs.find(y => y.id == a.abastecimento_id) || {}; return `nº ${x.numero} (${D(x.data)}): ${dec(a.valor)}`; }).join(' | ')])]); }
 };
 document.addEventListener('click', e => { const t = e.target.closest('[data-act]'); if (t && ACT[t.dataset.act]) ACT[t.dataset.act](t.dataset); });
 document.addEventListener('input', e => { const k = e.target.dataset.f; if (k) { S.f[k] = e.target.value; listaAbs(); } });
