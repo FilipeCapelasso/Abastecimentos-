@@ -2,7 +2,7 @@
 -- CONTROLE DE ABASTECIMENTOS - BANCO DE DADOS (SUPABASE / POSTGRES)
 -- Como usar: Supabase > SQL Editor > New query > cole TUDO > Run.
 -- Pode rodar de novo sem medo (os comandos são repetíveis).
--- IMPORTANTE: este arquivo NÃO contém o token do Telegram. Veja o passo C no final.
+-- ATENÇÃO: este arquivo já contém o token do seu bot. Não compartilhe com ninguém.
 -- Versão completa: abastecimentos, pagamentos, histórico, avisos e BOT com comandos.
 -- =====================================================================
 
@@ -55,8 +55,10 @@ create table if not exists public.app_config (
 alter table public.app_config enable row level security;   -- sem políticas = fechado
 insert into public.app_config(chave, valor) values
   ('telegram_token',    '8628884766:AAGJHRoelEX2vM1tACQ2luJkDVOmFQhx1Tg'),
-  ('telegram_chat_ids', '7694564020')
-on conflict (chave) do nothing;
+  ('telegram_chat_ids', '7694564020'),
+  ('supabase_url',      'https://mkzkasgaxzpynrhrgmrt.supabase.co'),
+  ('supabase_anon',     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1remthc2dheHpweW5yaHJnbXJ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA2NDQxNDYsImV4cCI6MjEwNjIyMDE0Nn0.Aax_OwDl4HZHMbN0LAqmGQvd9OqA_simRLWxBmINJCk')
+on conflict (chave) do update set valor = excluded.valor;
 
 -- 4) TABELAS PRINCIPAIS (sem horário: só a data)
 create table if not exists public.abastecimentos (
@@ -652,6 +654,93 @@ do $$ begin
   begin alter publication supabase_realtime add table public.alocacoes;      exception when duplicate_object then null; end;
 end $$;
 
+-- 7C) LIGAÇÃO DO TELEGRAM COM O BANCO (sem Edge Function: o Telegram chama o banco direto)
+create or replace function public.bot_enviar(p_chat text, p_resp jsonb) returns void
+language plpgsql security definer set search_path = public as $f$
+declare v_token text; v_kb jsonb := '[]'::jsonb; v_b jsonb := coalesce(p_resp->'b', '[]'::jsonb);
+        v_n int := jsonb_array_length(coalesce(p_resp->'b', '[]'::jsonb)); i int; v_row jsonb; v_body jsonb;
+begin
+  select valor into v_token from public.app_config where chave = 'telegram_token';
+  i := 0;
+  while i < v_n loop
+    v_row := jsonb_build_array(jsonb_build_object('text', v_b->i->>0, 'callback_data', v_b->i->>1));
+    if i + 1 < v_n then
+      v_row := v_row || jsonb_build_array(jsonb_build_object('text', v_b->(i+1)->>0, 'callback_data', v_b->(i+1)->>1));
+    end if;
+    v_kb := v_kb || jsonb_build_array(v_row);
+    i := i + 2;
+  end loop;
+  v_body := jsonb_build_object('chat_id', p_chat, 'text', p_resp->>'t');
+  if v_n > 0 then v_body := v_body || jsonb_build_object('reply_markup', jsonb_build_object('inline_keyboard', v_kb)); end if;
+  perform net.http_post(url := 'https://api.telegram.org/bot' || v_token || '/sendMessage',
+                        body := v_body, headers := '{"Content-Type":"application/json"}'::jsonb);
+end $f$;
+
+-- O Telegram chama esta função (via API do Supabase). Só funciona com o segredo certo.
+create or replace function public.telegram_webhook(
+  update_id bigint default null, message jsonb default null, callback_query jsonb default null,
+  edited_message jsonb default null, my_chat_member jsonb default null)
+returns jsonb language plpgsql security definer set search_path = public as $f$
+declare v_sec text; v_hdr text; v_chat text; v_txt text; v_token text; v_h jsonb := '{"Content-Type":"application/json"}'::jsonb;
+begin
+  select value into v_hdr from jsonb_each_text(coalesce(nullif(current_setting('request.headers', true), ''), '{}')::jsonb)
+   where lower(key) = 'x-telegram-bot-api-secret-token';
+  select valor into v_sec from public.app_config where chave = 'telegram_webhook_secret';
+  if v_hdr is null or v_hdr is distinct from v_sec then return '{}'::jsonb; end if;
+  select valor into v_token from public.app_config where chave = 'telegram_token';
+
+  if callback_query is not null then
+    v_chat := callback_query->'message'->'chat'->>'id'; v_txt := callback_query->>'data';
+    perform net.http_post(url := 'https://api.telegram.org/bot' || v_token || '/answerCallbackQuery',
+      body := jsonb_build_object('callback_query_id', callback_query->>'id'), headers := v_h);
+    perform net.http_post(url := 'https://api.telegram.org/bot' || v_token || '/editMessageReplyMarkup',
+      body := jsonb_build_object('chat_id', v_chat, 'message_id', (callback_query->'message'->>'message_id')::bigint,
+                                 'reply_markup', jsonb_build_object('inline_keyboard', '[]'::jsonb)), headers := v_h);
+  elsif message is not null then
+    v_chat := message->'chat'->>'id'; v_txt := message->>'text';
+  end if;
+  if v_chat is null or v_txt is null then return '{}'::jsonb; end if;
+
+  perform public.bot_enviar(v_chat, public.bot_processar(v_chat, v_txt));
+  return '{}'::jsonb;
+exception when others then
+  begin perform public.bot_enviar(v_chat, public._r('⚠️ Erro: ' || sqlerrm)); exception when others then null; end;
+  return '{}'::jsonb;
+end $f$;
+
+-- Liga o bot: registra o endereço no Telegram e o menu de comandos. Pode rodar de novo quando quiser.
+create or replace function public.bot_ativar() returns void
+language plpgsql security definer set search_path = public as $f$
+declare v_token text; v_sec text; v_url text; v_key text; v_h jsonb := '{"Content-Type":"application/json"}'::jsonb;
+begin
+  select valor into v_token from public.app_config where chave = 'telegram_token';
+  select valor into v_sec   from public.app_config where chave = 'telegram_webhook_secret';
+  select valor into v_url   from public.app_config where chave = 'supabase_url';
+  select valor into v_key   from public.app_config where chave = 'supabase_anon';
+  perform net.http_post(url := 'https://api.telegram.org/bot' || v_token || '/setWebhook',
+    body := jsonb_build_object('url', v_url || '/rest/v1/rpc/telegram_webhook?apikey=' || v_key,
+      'secret_token', v_sec, 'allowed_updates', jsonb_build_array('message','callback_query'), 'drop_pending_updates', true),
+    headers := v_h);
+  perform net.http_post(url := 'https://api.telegram.org/bot' || v_token || '/setMyCommands',
+    body := jsonb_build_object('commands', jsonb_build_array(
+      jsonb_build_object('command','abastecimento','description','Registrar um abastecimento'),
+      jsonb_build_object('command','pagamento','description','Registrar um pagamento'),
+      jsonb_build_object('command','status','description','Resumo geral'),
+      jsonb_build_object('command','pendentes','description','O que falta pagar'),
+      jsonb_build_object('command','ultimos','description','Últimos registros'),
+      jsonb_build_object('command','cancelar','description','Cancelar o que está em andamento'),
+      jsonb_build_object('command','ajuda','description','Ver os comandos'))), headers := v_h);
+end $f$;
+
+-- Pergunta ao Telegram como está a ligação (resultado: veja o passo E no final)
+create or replace function public.bot_conferir() returns void
+language plpgsql security definer set search_path = public as $f$
+declare v_token text;
+begin
+  select valor into v_token from public.app_config where chave = 'telegram_token';
+  perform net.http_get(url := 'https://api.telegram.org/bot' || v_token || '/getWebhookInfo');
+end $f$;
+
 -- 8) PERMISSÕES FINAIS (fecha tudo e libera só o necessário)
 revoke all on all tables in schema public from anon, authenticated;
 grant select on public.perfis, public.abastecimentos, public.pagamentos,
@@ -669,6 +758,11 @@ grant execute on function
   public.testar_telegram()
 to authenticated;
 grant execute on function public.bot_processar(text,text) to service_role;   -- só o servidor chama o bot
+-- única função aberta ao Telegram (protegida pelo segredo do webhook):
+grant execute on function public.telegram_webhook(bigint,jsonb,jsonb,jsonb,jsonb) to anon;
+
+-- 9) LIGA O BOT (registra o webhook e o menu de comandos no Telegram)
+select public.bot_ativar();
 
 -- =====================================================================
 -- PASSOS MANUAIS DEPOIS DE RODAR ESTE ARQUIVO
@@ -683,22 +777,16 @@ grant execute on function public.bot_processar(text,text) to service_role;   -- 
 --    update public.perfis set papel = 'admin'     -- pode registrar
 --     where user_id = (select id from auth.users where email = 'funcionario@email.com');
 --
--- C) Telegram (rode numa consulta separada e NÃO salve essa consulta):
---    update public.app_config set valor = 'SEU_TOKEN_DO_BOTFATHER' where chave = 'telegram_token';
---    update public.app_config set valor = '111111111,222222222'     where chave = 'telegram_chat_ids';
---    (cada pessoa precisa abrir o bot e mandar /start antes de receber mensagens)
---    Se uma mensagem não chegar, veja o motivo com:
---    select status_code, content from net._http_response order by created desc limit 5;
+-- C) Telegram: o token e o ID já estão preenchidos no passo 3 e o bot é ligado
+--    sozinho no passo 9. Depois de rodar tudo, espere uns 10 segundos e mande
+--    /start para o bot. Nada mais precisa ser configurado.
 --
--- D) Backup: Supabase > Database > Backups (diário nos planos pagos). No plano
---    gratuito, use os botões "Baixar planilha" do site toda semana.
+-- D) Bot só de consulta para alguns chats (opcional):
+--    update public.app_config set valor = 'ID1,ID2' where chave = 'telegram_admins';
+--    (quem estiver aí pode registrar; os demais de telegram_chat_ids só consultam)
 --
--- E) BOT COM COMANDOS (depois de rodar este arquivo e de fazer o passo C):
---    1. Supabase > Edge Functions > Deploy a new function > Via Editor > nome: telegram-bot
---       Cole o arquivo telegram-bot/index.ts e faça o Deploy. Desligue "Verify JWT" nas configurações da função.
---    2. select valor from public.app_config where chave = 'telegram_webhook_secret';   (copie o segredo)
---    3. Abra no navegador (troque SEU_TOKEN e SEGREDO):
---       https://api.telegram.org/botSEU_TOKEN/setWebhook?url=https://mkzkasgaxzpynrhrgmrt.supabase.co/functions/v1/telegram-bot&secret_token=SEGREDO
---    4. Mande /start para o bot. Para deixar algum chat só com consulta, preencha telegram_admins:
---       update public.app_config set valor = 'ID1,ID2' where chave = 'telegram_admins';
+-- E) Se o bot não responder, rode estas duas consultas, uma de cada vez, e me mande o resultado:
+--    select public.bot_conferir();
+--    select status_code, content from net._http_response order by created desc limit 3;
+--    Para religar o bot: select public.bot_ativar();
 -- =====================================================================
